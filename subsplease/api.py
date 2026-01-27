@@ -91,7 +91,7 @@ class Subsplease:
         )
         return Ok(list(data.values()))
 
-    def show(self, show_id: int):
+    def show(self, show_id: int) -> Result[ShowData, str]:
         url = f"{self.url}?f=show&tz={self.timezone}&sid={show_id}"
         response = requests.get(url)
         if response.status_code != 200:
@@ -102,3 +102,15 @@ class Subsplease:
         )
         print(data)
         return Ok(data)
+
+    def search(self, query: str
+               ) -> Result[list[EpisodeData], str]:
+        url = f"{self.url}?f=search&tz={self.timezone}&s={query}"
+        response = requests.get(url)
+        if response.status_code != 200:
+            return Err(f'Error {response.status_code} on request')
+        data = msgspec.json.decode(
+                response.content,
+                type=dict[str, EpisodeData]
+        )
+        return Ok(list(data.values()))
