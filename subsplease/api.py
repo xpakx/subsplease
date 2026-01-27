@@ -41,9 +41,13 @@ class EpisodeData(msgspec.Struct):
     release_date: str
     show: str
     episode: str
-    page: str
-    image_url: str
     downloads: list[DownloadData]
+    image_url: str = ""
+    page: str = ""
+
+
+class ShowData(msgspec.Struct):
+    episode: dict[str, EpisodeData]
 
 
 class Subsplease:
@@ -86,3 +90,15 @@ class Subsplease:
                 type=dict[str, EpisodeData]
         )
         return Ok(list(data.values()))
+
+    def show(self, show_id: int):
+        url = f"{self.url}?f=show&tz={self.timezone}&sid={show_id}"
+        response = requests.get(url)
+        if response.status_code != 200:
+            return Err(f'Error {response.status_code} on request')
+        data = msgspec.json.decode(
+                response.content,
+                type=ShowData
+        )
+        print(data)
+        return Ok(data)
