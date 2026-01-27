@@ -1,10 +1,12 @@
-from api import Schedule
+from api import Schedule, ScheduleEntry
 from rich.console import Console
 from rich.table import Table
 from rich import box
 
 
-def display_schedule(data: Schedule):
+def display_schedule(data: Schedule | list[ScheduleEntry]):
+    if isinstance(data, Schedule):
+        data = data.schedule
     console = Console()
     table = Table(
         box=box.ROUNDED,
@@ -17,7 +19,7 @@ def display_schedule(data: Schedule):
     table.add_column("Status", justify="center", width=12)
     table.add_column("Title", style="white")
 
-    for entry in data.schedule:
+    for entry in data:
         if entry.aired:
             time_display = f"[dim]{entry.time}[/dim]"
             status = "[dim]✅ Aired[/dim]"

@@ -8,12 +8,27 @@ class ScheduleEntry(msgspec.Struct):
     page: str
     image_url: str
     time: str
-    aired: bool
+    aired: bool | None = None
 
 
 class Schedule(msgspec.Struct):
     tz: str
     schedule: list[ScheduleEntry]
+
+
+class Week(msgspec.Struct, rename='pascal'):
+    monday: list[ScheduleEntry]
+    tuesday: list[ScheduleEntry]
+    wednesday: list[ScheduleEntry]
+    thursday: list[ScheduleEntry]
+    friday: list[ScheduleEntry]
+    saturday: list[ScheduleEntry]
+    sunday: list[ScheduleEntry]
+
+
+class WeeklySchedule(msgspec.Struct):
+    tz: str
+    schedule: Week
 
 
 class DownloadData(msgspec.Struct):
@@ -43,6 +58,17 @@ class Subsplease:
         data = msgspec.json.decode(
                 response.content,
                 type=Schedule
+        )
+        return Ok(data)
+
+    def weekly_schedule(self, timezone: str) -> Result[WeeklySchedule, str]:
+        url = f"{self.url}?f=schedule&tz={timezone}"
+        response = requests.get(url)
+        if response.status_code != 200:
+            return Err(f'Error {response.status_code} on request')
+        data = msgspec.json.decode(
+                response.content,
+                type=WeeklySchedule
         )
         return Ok(data)
 
