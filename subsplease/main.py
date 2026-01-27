@@ -6,11 +6,11 @@ import subprocess
 
 def main():
     subs = Subsplease()
-    # res = subs.weekly_schedule('Europe/Warsaw')
+    # res = subs.weekly_schedule()
     # display_schedule(res.unwrap().schedule.monday)
-    res = subs.schedule('Europe/Warsaw')
+    res = subs.schedule()
     display_schedule(res.unwrap())
-    # latests = subs.latest('Europe/Warsaw')
+    # latests = subs.latest()
     # latests = latests.unwrap()
     # magnet(latests[0], '480')
 

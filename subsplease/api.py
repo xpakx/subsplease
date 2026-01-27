@@ -47,11 +47,12 @@ class EpisodeData(msgspec.Struct):
 
 
 class Subsplease:
-    def __init__(self):
+    def __init__(self, timezone: str = 'Europe/Warsaw'):
         self.url = "https://subsplease.org/api/"
+        self.timezone = timezone
 
-    def schedule(self, timezone: str) -> Result[Schedule, str]:
-        url = f"{self.url}?f=schedule&h=true&tz={timezone}"
+    def schedule(self) -> Result[Schedule, str]:
+        url = f"{self.url}?f=schedule&h=true&tz={self.timezone}"
         response = requests.get(url)
         if response.status_code != 200:
             return Err(f'Error {response.status_code} on request')
@@ -61,8 +62,8 @@ class Subsplease:
         )
         return Ok(data)
 
-    def weekly_schedule(self, timezone: str) -> Result[WeeklySchedule, str]:
-        url = f"{self.url}?f=schedule&tz={timezone}"
+    def weekly_schedule(self) -> Result[WeeklySchedule, str]:
+        url = f"{self.url}?f=schedule&tz={self.timezone}"
         response = requests.get(url)
         if response.status_code != 200:
             return Err(f'Error {response.status_code} on request')
@@ -72,9 +73,9 @@ class Subsplease:
         )
         return Ok(data)
 
-    def latest(self, timezone: str, page: int | None = None
+    def latest(self, page: int | None = None
                ) -> Result[list[EpisodeData], str]:
-        url = f"{self.url}?f=latest&tz={timezone}"
+        url = f"{self.url}?f=latest&tz={self.timezone}"
         if page is not None:
             url += f'&p={page}'
         response = requests.get(url)
