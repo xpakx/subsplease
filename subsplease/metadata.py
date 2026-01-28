@@ -27,6 +27,7 @@ class MetadataProvider:
         self.url = "https://graphql.anilist.co/"
 
     def search_show(self, query: str) -> Result[AniListMedia, str]:
+        query = query.replace('(JP)', '')
         query_string = """
         query ($search: String) {
           Media (search: $search, type: ANIME) {
