@@ -70,3 +70,32 @@ class AnimeDB:
                 return Ok(shows)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def update_show(self, show: LocalShow) -> Result[bool, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                cursor = con.execute("""
+                    UPDATE shows
+                    SET anilist_id = ?,
+                        title_romaji = ?,
+                        title_english = ?,
+                        title_japanese = ?,
+                        last_episode = ?,
+                        tracking = ?,
+                        current = ?
+                    WHERE sid = ?
+                """, (
+                    show.anilist_id,
+                    show.title_romaji,
+                    show.title_english,
+                    show.title_japanese,
+                    show.episode,
+                    show.tracking,
+                    show.current,
+                    show.sid
+                ))
+                if cursor.rowcount == 0:
+                    return Err(f"Show with sid '{show.sid}' not found in DB.")
+            return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")

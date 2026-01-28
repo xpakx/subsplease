@@ -20,14 +20,15 @@ def main():
         if not local:
             db.create_entry(show.page, show.title)
         if local and not local.anilist_id:
+            print("Fetching")
             result = meta.search_show(show.title)
             if result.is_ok():
                 ani_list_show = result.ok()
                 local.title_english = ani_list_show.title.english
                 local.title_japanese = ani_list_show.title.native
                 local.anilist_id = ani_list_show.id
+                db.update_show(local)
 
-    print(current)
     # display_schedule(res.unwrap().schedule.monday)
     # res = subs.search("frieren")
     # print(res.unwrap()[0])
