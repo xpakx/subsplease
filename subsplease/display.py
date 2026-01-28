@@ -1,10 +1,13 @@
 from api import Schedule, ScheduleEntry
+from db import LocalShow
 from rich.console import Console
 from rich.table import Table
 from rich import box
 
 
-def display_schedule(data: Schedule | list[ScheduleEntry]):
+def display_schedule(
+        data: Schedule | list[ScheduleEntry],
+        local: dict[str, LocalShow] | None = None):
     if isinstance(data, Schedule):
         data = data.schedule
     console = Console()
@@ -20,15 +23,20 @@ def display_schedule(data: Schedule | list[ScheduleEntry]):
     table.add_column("Title", style="white")
 
     for entry in data:
+        title = entry.title
+        if local:
+            local_entry = local.get(entry.page)
+            if local_entry and local_entry.title_english is not None:
+                title = local_entry.title_english
         if entry.aired:
             time_display = f"[dim]{entry.time}[/dim]"
             status = "[dim]✅ Aired[/dim]"
-            title = f"[dim]{entry.title}[/dim]"
+            title = f"[dim]{title}[/dim]"
             row_style = "dim"
         else:
             time_display = f"[bold cyan]{entry.time}[/bold cyan]"
             status = "[bold green]⏳ Upcoming[/bold green]"
-            title = f"[bold white]{entry.title}[/bold white]"
+            title = f"[bold white]{title}[/bold white]"
             row_style = ""
 
         table.add_row(time_display, status, title, style=row_style)

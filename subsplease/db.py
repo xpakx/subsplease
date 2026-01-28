@@ -12,6 +12,7 @@ class LocalShow(msgspec.Struct):
     title_japanese: str | None
     episode: int
     tracking: bool
+    current: bool
 
 
 class AnimeDB:
@@ -28,6 +29,7 @@ class AnimeDB:
                     anilist_id INTEGER,
                     title_romaji TEXT NOT NULL,
                     title_english TEXT,
+                    title_japanese TEXT,
                     last_episode INTEGER DEFAULT 0,
                     tracking BOOLEAN DEFAULT 0,
                     current BOOLEAN DEFAULT 0
@@ -42,5 +44,29 @@ class AnimeDB:
                     VALUES (?, ?, 1)
                 """, (sid, romaji))
             return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def get_airing_shows(self) -> Result[list[LocalShow], str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute("SELECT * FROM shows WHERE current = 1")
+                rows = cur.fetchall()
+
+                shows = [
+                    LocalShow(
+                        id=r['id'],
+                        sid=r['sid'],
+                        anilist_id=r['anilist_id'],
+                        title_romaji=r['title_romaji'],
+                        title_english=r['title_english'],
+                        title_japanese=r['title_japanese'],
+                        episode=r['last_episode'],
+                        tracking=bool(r['tracking']),
+                        current=bool(r['current']),
+                    ) for r in rows
+                ]
+                return Ok(shows)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
