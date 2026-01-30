@@ -99,3 +99,29 @@ class AnimeDB:
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def toggle_tracking(self, sid: str,
+                        status: bool) -> Result[bool, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.execute("""
+                            UPDATE shows
+                            SET tracking = ?
+                            WHERE sid = ?
+                """, (status, sid))
+            return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def toggle_current(self, sid: str,
+                       status: bool) -> Result[bool, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.execute("""
+                            UPDATE shows
+                            SET current = ?
+                            WHERE sid = ?
+                """, (status, sid))
+            return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
