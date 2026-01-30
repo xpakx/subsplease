@@ -8,4 +8,5 @@ dependencies = [
     "msgspec>=0.20.0",
     "requests>=2.32.5",
     "rich>=14.3.1",
+    "transmission-rpc>=7.0.11",
 ]
