@@ -2,7 +2,7 @@ from api import Subsplease
 from torrent import magnet
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import today
+from utils import today, schedule
 import subprocess
 import time
 from torrent import send_magnet_to_transmission
