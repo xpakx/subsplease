@@ -54,3 +54,50 @@ class MetadataProvider:
             return Ok(data.data.Media)
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
+
+    def fetch_titles(self, titles: list[str]) -> Result[dict, str]:
+        query_parts = []
+
+        fragment = """
+            id
+            title {
+                romaji
+                english
+                native
+            }
+        """
+
+        for index, title in enumerate(titles):
+            safe_title = title.replace('"', '\\"')
+
+            part = f's{index}: Media(search: "{safe_title}", type: ANIME) {{ {fragment} }}'
+            query_parts.append(part)
+
+        full_query = "query { " + " ".join(query_parts) + " }"
+
+        response = requests.post(
+            self.url,
+            json={'query': full_query}
+        )
+
+        if response.status_code != 200:
+            return Err(f"AniList API Error: {response.text}")
+
+        try:
+            print(response.content)
+            # TODO: typing
+            raw_data = msgspec.json.decode(response.content)
+            data_block = raw_data.get("data", {})
+
+            mapped_results = {}
+            for index, original_title in enumerate(titles):
+                key = f"s{index}"
+                if key in data_block and data_block[key] is not None:
+                    mapped_results[original_title] = data_block[key]
+                else:
+                    mapped_results[original_title] = None
+
+            return Ok(mapped_results)
+
+        except msgspec.DecodeError as e:
+            return Err(f"Decode error: {e}")
