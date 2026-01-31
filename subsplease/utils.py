@@ -4,7 +4,8 @@ from db import AnimeDB, LocalShow
 from display import display_schedule
 
 
-def today(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
+def today(meta: MetadataProvider, db: AnimeDB,
+          subs: Subsplease, only_tracked: bool = False):
     airing = db.get_airing_shows().unwrap()
     current = {x.sid: x for x in airing}
     res = subs.schedule()
@@ -15,8 +16,7 @@ def today(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
             db.create_entry(show.page, show.title)
         if local and not local.anilist_id:
             fetch_show(meta, db, show.title, local)
-    print(meta.fetch_titles([x.title for x in today_shows]))
-    display_schedule(res.unwrap(), current)
+    display_schedule(res.unwrap(), current, only_tracked)
 
 
 def schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):

@@ -7,7 +7,8 @@ from rich import box
 
 def display_schedule(
         data: Schedule | list[ScheduleEntry],
-        local: dict[str, LocalShow] | None = None):
+        local: dict[str, LocalShow] | None = None,
+        only_tracked: bool = False):
     if isinstance(data, Schedule):
         data = data.schedule
     console = Console()
@@ -28,6 +29,8 @@ def display_schedule(
             local_entry = local.get(entry.page)
             if local_entry and local_entry.title_english is not None:
                 title = local_entry.title_english
+            if only_tracked and (not local_entry or not local_entry.tracking):
+                continue
         if entry.aired:
             time_display = f"[dim]{entry.time}[/dim]"
             status = "[dim]✅ Aired[/dim]"
