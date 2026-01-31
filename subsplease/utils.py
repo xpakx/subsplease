@@ -15,6 +15,7 @@ def today(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
             db.create_entry(show.page, show.title)
         if local and not local.anilist_id:
             fetch_show(meta, db, show.title, local)
+    print(meta.fetch_titles([x.title for x in today_shows]))
     display_schedule(res.unwrap(), current)
 
 

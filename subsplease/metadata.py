@@ -22,6 +22,10 @@ class AniListResponse(msgspec.Struct):
     data: AniListData
 
 
+class AniTitles(msgspec.Struct):
+    data: dict[str, AniListMedia]
+
+
 class MetadataProvider:
     def __init__(self):
         self.url = "https://graphql.anilist.co/"
@@ -86,16 +90,20 @@ class MetadataProvider:
         try:
             print(response.content)
             # TODO: typing
-            raw_data = msgspec.json.decode(response.content)
-            data_block = raw_data.get("data", {})
+
+            data = msgspec.json.decode(
+                    response.content,
+                    type=AniTitles
+            )
+            data_block = data.data
 
             mapped_results = {}
-            for index, original_title in enumerate(titles):
+            for index, show in enumerate(data_block.values()):
                 key = f"s{index}"
                 if key in data_block and data_block[key] is not None:
-                    mapped_results[original_title] = data_block[key]
+                    mapped_results[show.id] = show
                 else:
-                    mapped_results[original_title] = None
+                    mapped_results[show.id] = None
 
             return Ok(mapped_results)
 
