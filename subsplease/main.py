@@ -4,7 +4,7 @@ from metadata import MetadataProvider
 from db import AnimeDB
 from utils import today, schedule
 from torrent import send_magnet_to_transmission
-from display import display_schedule
+from display import display_schedule, display_latest
 import subprocess
 import time
 import argparse
@@ -16,7 +16,6 @@ def main():
     # res = subs.search("frieren")
     # print(res.unwrap()[0])
     # magnet(latests[0], '480')
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
@@ -30,9 +29,9 @@ if __name__ == "__main__":
     subs = Subsplease()
     if args.latest:
         data = subs.latest()
-        print(data)
+        display_latest(data.unwrap(), None, only_tracked=args.tracked)
     elif args.weekly:
         data = subs.weekly_schedule()
-        display_schedule(res.unwrap().schedule.monday)
+        display_schedule(data.unwrap().schedule.monday)
     else:
         today(meta, db, subs, only_tracked=args.tracked)
