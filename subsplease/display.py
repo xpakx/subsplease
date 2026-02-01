@@ -63,7 +63,7 @@ def display_latest(
     table.add_column("Episode", justify="center", width=12)
     table.add_column("Title", style="white")
 
-    for entry in latest:
+    for num, entry in enumerate(latest):
         title = entry.show
         new_ep = entry.time == 'New'
         if local:
@@ -76,7 +76,7 @@ def display_latest(
             date = f"[bold cyan]{entry.release_date}[/bold cyan]"
             status = "[bold white] New[/bold white]"
             title = f"[bold green]{title}[/bold green]"
-            episode = f"[white]{entry.episode}[/white]"
+            episode = f"[white]\[{num}] {entry.episode}[/white]"
             row_style = "dim"
         else:
             date = f"[dim]{entry.release_date}[/dim]"

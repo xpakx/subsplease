@@ -22,11 +22,23 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--tracked", action="store_true", help="Show only tracked")
     parser.add_argument("-l", "--latest", action="store_true", help="Get latest episodes")
     parser.add_argument("-w", "--weekly", action="store_true", help="Show weekly schedule")
+    parser.add_argument('-d', '--download', type=int, help="Id to download")
+    parser.add_argument('-q', '--quality', type=int, default=720, help="Quality to download")
 
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB()
     subs = Subsplease()
+    id = args.download
+    if id is not None:
+        data = subs.latest()
+        print(len(data.unwrap()))
+        data = [show for show in data.unwrap() if show.time == 'New']
+        show = data[id]
+        send_magnet_to_transmission(show, str(args.quality))
+        exit(1)
+
+    print(id)
     if args.latest:
         data = subs.latest()
         display_latest(data.unwrap(), None, only_tracked=args.tracked)
