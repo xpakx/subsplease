@@ -2,7 +2,7 @@ from api import Subsplease
 from torrent import magnet
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import today, schedule
+from utils import today, schedule, latest
 from torrent import send_magnet_to_transmission
 from display import display_schedule, display_latest
 import subprocess
@@ -36,12 +36,11 @@ if __name__ == "__main__":
         data = [show for show in data.unwrap() if show.time == 'New']
         show = data[id]
         send_magnet_to_transmission(show, str(args.quality))
-        exit(1)
+        exit(0)
 
     print(id)
     if args.latest:
-        data = subs.latest()
-        display_latest(data.unwrap(), None, only_tracked=args.tracked)
+        latest(meta, db, subs, only_tracked=args.tracked)
     elif args.weekly:
         data = subs.weekly_schedule()
         display_schedule(data.unwrap().schedule.monday)

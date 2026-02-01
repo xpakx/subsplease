@@ -1,7 +1,7 @@
 from api import Subsplease, ScheduleEntry
 from metadata import MetadataProvider
 from db import AnimeDB, LocalShow
-from display import display_schedule
+from display import display_schedule, display_latest
 
 
 def today(meta: MetadataProvider, db: AnimeDB,
@@ -53,3 +53,11 @@ def fetch_show(meta: MetadataProvider, db: AnimeDB,
         show.title_japanese = ani_list_show.title.native
         show.anilist_id = ani_list_show.id
         db.update_show(show)
+
+
+def latest(meta: MetadataProvider, db: AnimeDB,
+           subs: Subsplease, only_tracked: bool = False):
+    airing = db.get_airing_shows().unwrap()
+    current = {x.sid: x for x in airing}
+    episodes = subs.latest()
+    display_latest(episodes.unwrap(), current, only_tracked)
