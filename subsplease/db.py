@@ -125,3 +125,28 @@ class AnimeDB:
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def get_show(self, sid: str) -> Result[LocalShow, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                print(sid)
+                cur = con.execute(
+                        "SELECT * FROM shows WHERE sid = ? LIMIT 1", 
+                        (sid,))
+                r = cur.fetchone()
+
+                show = LocalShow(
+                        id=r['id'],
+                        sid=r['sid'],
+                        anilist_id=r['anilist_id'],
+                        title_romaji=r['title_romaji'],
+                        title_english=r['title_english'],
+                        title_japanese=r['title_japanese'],
+                        episode=r['last_episode'],
+                        tracking=bool(r['tracking']),
+                        current=bool(r['current']))
+
+                return Ok(show)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
