@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "feedparser>=6.0.12",
     "msgspec>=0.20.0",
     "requests>=2.32.5",
     "rich>=14.3.1",
