@@ -19,7 +19,7 @@ def today(meta: MetadataProvider, db: AnimeDB,
     display_schedule(res.unwrap(), current, only_tracked)
 
 
-def schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
+def update_schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
     airing = db.get_airing_shows().unwrap()
     current = {x.sid: x for x in airing}
     res = subs.weekly_schedule()
@@ -31,6 +31,43 @@ def schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
     get_day(week.friday, meta, db, subs, current)
     get_day(week.saturday, meta, db, subs, current)
     get_day(week.sunday, meta, db, subs, current)
+
+
+def show_day(meta: MetadataProvider, db: AnimeDB, subs: Subsplease, day: str):
+    airing = db.get_airing_shows().unwrap()
+    current = {x.sid: x for x in airing}
+    res = subs.weekly_schedule()
+    week = res.unwrap().schedule
+
+    match day:
+        case 'monday':
+            get_day(week.monday, meta, db, subs, current)
+            print("Monday")
+            display_schedule(week.monday, current)
+        case 'tuesday':
+            get_day(week.tuesday, meta, db, subs, current)
+            print("Tuesday")
+            display_schedule(week.tuesday, current)
+        case 'wednesday':
+            get_day(week.wednesday, meta, db, subs, current)
+            print("Wednesday")
+            display_schedule(week.wednesday, current)
+        case 'thursday':
+            get_day(week.thursday, meta, db, subs, current)
+            print("Thursday")
+            display_schedule(week.thursday, current)
+        case 'friday':
+            get_day(week.friday, meta, db, subs, current)
+            print("Friday")
+            display_schedule(week.friday, current)
+        case 'saturday':
+            get_day(week.saturday, meta, db, subs, current)
+            print("Saturday")
+            display_schedule(week.saturday, current)
+        case 'sunday':
+            get_day(week.sunday, meta, db, subs, current)
+            print("Sunday")
+            display_schedule(week.sunday, current)
 
 
 def get_day(shows: list[ScheduleEntry], meta: MetadataProvider,

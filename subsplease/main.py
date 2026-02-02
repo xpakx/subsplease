@@ -1,7 +1,7 @@
 from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import today, latest
+from utils import today, latest, update_schedule, show_day
 from torrent import send_magnet_to_transmission
 from display import display_schedule
 import argparse
@@ -24,8 +24,8 @@ if __name__ == "__main__":
             "-l", "--latest", action="store_true",
             help="Get latest episodes")
     parser.add_argument(
-            "-w", "--weekly", action="store_true",
-            help="Show weekly schedule")
+            "-u", "--update", action="store_true",
+            help="Update weekly schedule")
     parser.add_argument(
             '-d', '--download', type=int,
             help="Id to download")
@@ -35,6 +35,9 @@ if __name__ == "__main__":
     parser.add_argument(
             '-s', '--subscribe', type=int,
             help="Id to subscribe")
+    parser.add_argument(
+            '-w', '--weekday', type=str,
+            help="Day to show")
 
     args = parser.parse_args()
     meta = MetadataProvider()
@@ -58,8 +61,9 @@ if __name__ == "__main__":
     print(id)
     if args.latest:
         latest(meta, db, subs, only_tracked=args.tracked)
-    elif args.weekly:
-        data = subs.weekly_schedule()
-        display_schedule(data.unwrap().schedule.monday)
+    elif args.weekday:
+        show_day(meta, db, subs, args.weekday)
+    elif args.update:
+        update_schedule(meta, db, subs)
     else:
         today(meta, db, subs, only_tracked=args.tracked)
