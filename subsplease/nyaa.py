@@ -28,7 +28,12 @@ def create_magnet(info_hash, title):
     return f"magnet:?{urllib.parse.urlencode(magnet_data, doseq=True)}"
 
 
-def nyaa_newest(query: str) -> Result[list[NyaaTorrent], str]:
+def nyaa_newest(query: str, quality: int | None = None
+                ) -> Result[list[NyaaTorrent], str]:
+    if quality:
+        query += f" {quality}p"
+    print(query)
+    query = urllib.parse.quote_plus(query)
     rss_url = f"https://nyaa.si/?page=rss&q={query}&c=1_2&f=0"
     feed = feedparser.parse(rss_url)
     results = []
