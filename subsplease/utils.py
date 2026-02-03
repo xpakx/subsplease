@@ -1,7 +1,7 @@
 from api import Subsplease, ScheduleEntry
 from metadata import MetadataProvider
 from db import AnimeDB, LocalShow
-from display import display_schedule, display_latest
+from display import display_schedule, display_latest, display_details
 
 
 def today(meta: MetadataProvider, db: AnimeDB,
@@ -101,6 +101,6 @@ def latest(meta: MetadataProvider, db: AnimeDB,
 
 
 def view_show(meta: MetadataProvider, db: AnimeDB, title: str):
-    print(title)
+    print(f"Searching '{title}'")
     result = meta.search_show_details(title).unwrap()
-    print(result)
+    display_details(result)

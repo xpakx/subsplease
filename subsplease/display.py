@@ -1,8 +1,13 @@
 from api import Schedule, ScheduleEntry, EpisodeData
 from db import LocalShow
+from metadata import AniListMediaDetails
 from rich.console import Console
 from rich.table import Table
 from rich import box
+from rich.text import Text
+from rich.panel import Panel
+from rich.markdown import Markdown
+from datetime import datetime
 
 
 def display_schedule(
@@ -88,3 +93,39 @@ def display_latest(
         table.add_row(date, episode + status, title, style=row_style)
 
     console.print(table)
+
+
+def display_details(show: AniListMediaDetails):
+    console = Console()
+
+    clean_desc = show.description or "No description."
+    title = show.title.english or show.title.romaji
+    status_color = "green" if show.status == "RELEASING" else "blue"
+    status_info = f"[{status_color}]{show.status}[/{status_color}]"
+
+    tag_list = [f"#{t.name}" for t in show.tags[:8]]
+    tags_display = "  ".join(tag_list)
+
+    content = Text()
+    content.append(f"{clean_desc}\n\n", style="white")
+    content.append(f"{tags_display}", style="dim")
+
+    panel = Panel(
+        content,
+        title=f"[bold yellow]{title}[/]",
+        subtitle=f"{status_info}",
+        expand=False,
+        border_style="bright_blue",
+        padding=(1, 2)
+    )
+
+    console.print(panel)
+
+    if show.nextAiringEpisode:
+        dt = datetime.fromtimestamp(show.nextAiringEpisode.airingAt)
+        day = dt.strftime('%A')
+        time = dt.strftime('%H:%M')
+        airing_info = f"\n[bold cyan]Next Ep {show.nextAiringEpisode.episode}:[/] {day} at {time}"
+        console.print(airing_info)
+
+    console.print("\n")

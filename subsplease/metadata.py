@@ -136,7 +136,7 @@ class MetadataProvider:
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
 
-    def search_show_details(self, query: str) -> Result[AniListMedia, str]:
+    def search_show_details(self, query: str) -> Result[AniListMediaDetails, str]:
         query = query.replace('(JP)', '')
         query_string = """
         query ($search: String) {
