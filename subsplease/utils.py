@@ -4,30 +4,6 @@ from db import AnimeDB, LocalShow
 from display import display_schedule, display_latest, display_details
 
 
-def update_schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
-    airing = db.get_airing_shows().unwrap()
-    current = {x.sid: x for x in airing}
-    res = subs.weekly_schedule()
-    week = res.unwrap().schedule
-    get_day(week.monday, meta, db, subs, current)
-    get_day(week.tuesday, meta, db, subs, current)
-    get_day(week.wednesday, meta, db, subs, current)
-    get_day(week.thursday, meta, db, subs, current)
-    get_day(week.friday, meta, db, subs, current)
-    get_day(week.saturday, meta, db, subs, current)
-    get_day(week.sunday, meta, db, subs, current)
-
-
-def get_day(shows: list[ScheduleEntry], meta: MetadataProvider,
-            db: AnimeDB, subs: Subsplease, current):
-    for show in shows:
-        local = current.get(show.page)
-        if not local:
-            db.create_entry(show.page, show.title)
-        if local and not local.anilist_id:
-            fetch_show(meta, db, show.title, local)
-
-
 def fetch_show(meta: MetadataProvider, db: AnimeDB,
                title: str, show: LocalShow):
     print("Fetching")
@@ -108,3 +84,14 @@ class Program:
                 self.db.create_entry(show.page, show.title)
             if local and not local.anilist_id:
                 self.fetch_show(show.title, local)
+
+    def update_schedule(self):
+        res = self.subs.weekly_schedule()
+        week = res.unwrap().schedule
+        self.get_day(week.monday)
+        self.get_day(week.tuesday)
+        self.get_day(week.wednesday)
+        self.get_day(week.thursday)
+        self.get_day(week.friday)
+        self.get_day(week.saturday)
+        self.get_day(week.sunday)
