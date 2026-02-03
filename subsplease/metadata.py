@@ -22,6 +22,32 @@ class AniListResponse(msgspec.Struct):
     data: AniListData
 
 
+class AniListTag(msgspec.Struct):
+    name: str
+
+
+class AniListAiring(msgspec.Struct):
+    airingAt: int
+    episode: int
+
+
+class AniListMediaDetails(msgspec.Struct):
+    id: int
+    title: AniListTitle
+    description: str
+    status: str
+    nextAiringEpisode: AniListAiring | None
+    tags: list[AniListTag]
+
+
+class AniListDetails(msgspec.Struct):
+    Media: AniListMediaDetails
+
+
+class AniListResponseDetails(msgspec.Struct):
+    data: AniListDetails
+
+
 class AniTitles(msgspec.Struct):
     data: dict[str, AniListMedia]
 
@@ -107,5 +133,41 @@ class MetadataProvider:
 
             return Ok(mapped_results)
 
+        except msgspec.DecodeError as e:
+            return Err(f"Decode error: {e}")
+
+    def search_show_details(self, query: str) -> Result[AniListMedia, str]:
+        query = query.replace('(JP)', '')
+        query_string = """
+        query ($search: String) {
+          Media (search: $search, type: ANIME) {
+            id
+            title {
+              romaji
+              english
+              native
+            }
+            description(asHtml: false)
+            status
+            nextAiringEpisode {
+              airingAt
+              episode
+            }
+            tags { name }
+          }
+        }
+        """
+
+        response = requests.post(
+            self.url,
+            json={'query': query_string, 'variables': {'search': query}}
+        )
+
+        if response.status_code != 200:
+            return Err(f"AniList API Error: {response.status_code}")
+
+        try:
+            data = msgspec.json.decode(response.content, type=AniListResponseDetails)
+            return Ok(data.data.Media)
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")

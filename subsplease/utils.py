@@ -102,5 +102,5 @@ def latest(meta: MetadataProvider, db: AnimeDB,
 
 def view_show(meta: MetadataProvider, db: AnimeDB, title: str):
     print(title)
-    result = meta.search_show(title).unwrap()
+    result = meta.search_show_details(title).unwrap()
     print(result)
