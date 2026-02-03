@@ -2,7 +2,7 @@ from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
 from utils import (
-        latest, update_schedule, show_day, view_show,
+        latest, update_schedule, view_show,
         Program
 )
 from torrent import send_magnet_to_transmission
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     if args.latest:
         latest(meta, db, subs, only_tracked=args.tracked)
     elif args.weekday:
-        show_day(meta, db, subs, args.weekday)
+        program.show_day(args.weekday)
     elif args.update:
         update_schedule(meta, db, subs)
     else:

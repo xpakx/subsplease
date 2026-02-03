@@ -18,43 +18,6 @@ def update_schedule(meta: MetadataProvider, db: AnimeDB, subs: Subsplease):
     get_day(week.sunday, meta, db, subs, current)
 
 
-def show_day(meta: MetadataProvider, db: AnimeDB, subs: Subsplease, day: str):
-    airing = db.get_airing_shows().unwrap()
-    current = {x.sid: x for x in airing}
-    res = subs.weekly_schedule()
-    week = res.unwrap().schedule
-
-    match day:
-        case 'monday':
-            get_day(week.monday, meta, db, subs, current)
-            print("Monday")
-            display_schedule(week.monday, current)
-        case 'tuesday':
-            get_day(week.tuesday, meta, db, subs, current)
-            print("Tuesday")
-            display_schedule(week.tuesday, current)
-        case 'wednesday':
-            get_day(week.wednesday, meta, db, subs, current)
-            print("Wednesday")
-            display_schedule(week.wednesday, current)
-        case 'thursday':
-            get_day(week.thursday, meta, db, subs, current)
-            print("Thursday")
-            display_schedule(week.thursday, current)
-        case 'friday':
-            get_day(week.friday, meta, db, subs, current)
-            print("Friday")
-            display_schedule(week.friday, current)
-        case 'saturday':
-            get_day(week.saturday, meta, db, subs, current)
-            print("Saturday")
-            display_schedule(week.saturday, current)
-        case 'sunday':
-            get_day(week.sunday, meta, db, subs, current)
-            print("Sunday")
-            display_schedule(week.sunday, current)
-
-
 def get_day(shows: list[ScheduleEntry], meta: MetadataProvider,
             db: AnimeDB, subs: Subsplease, current):
     for show in shows:
@@ -127,3 +90,21 @@ class Program:
             show.title_japanese = ani_list_show.title.native
             show.anilist_id = ani_list_show.id
             self.db.update_show(show)
+
+    def show_day(self, day: str):
+        res = self.subs.weekly_schedule()
+        week = res.unwrap().schedule
+        if not hasattr(week, day):
+            return
+        day_list = getattr(week, day)
+        self.get_day(day_list)
+        print(day.capitalize())
+        display_schedule(day_list, self.current)
+
+    def get_day(self, shows: list[ScheduleEntry]):
+        for show in shows:
+            local = self.current.get(show.page)
+            if not local:
+                self.db.create_entry(show.page, show.title)
+            if local and not local.anilist_id:
+                self.fetch_show(show.title, local)
