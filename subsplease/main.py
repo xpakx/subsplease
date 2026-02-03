@@ -1,9 +1,11 @@
 from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import today, latest, update_schedule, show_day, view_show
+from utils import (
+        latest, update_schedule, show_day, view_show,
+        Program
+)
 from torrent import send_magnet_to_transmission
-from display import display_schedule
 import argparse
 
 
@@ -46,6 +48,9 @@ if __name__ == "__main__":
     meta = MetadataProvider()
     db = AnimeDB()
     subs = Subsplease()
+    program = Program(subs, meta, db)
+    program.switch_only_tracked(args.tracked)
+
     id = args.download
     if id is not None:
         data = subs.latest()
@@ -72,4 +77,4 @@ if __name__ == "__main__":
     elif args.update:
         update_schedule(meta, db, subs)
     else:
-        today(meta, db, subs, only_tracked=args.tracked)
+        program.today()
