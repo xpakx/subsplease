@@ -1,7 +1,7 @@
 from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import today, latest, update_schedule, show_day
+from utils import today, latest, update_schedule, show_day, view_show
 from torrent import send_magnet_to_transmission
 from display import display_schedule
 import argparse
@@ -38,6 +38,9 @@ if __name__ == "__main__":
     parser.add_argument(
             '-w', '--weekday', type=str,
             help="Day to show")
+    parser.add_argument(
+            '-v', '--view', type=str,
+            help="Show to view")
 
     args = parser.parse_args()
     meta = MetadataProvider()
@@ -57,8 +60,11 @@ if __name__ == "__main__":
         show = data[id]
         show = db.toggle_tracking(show.page, True)
         exit(0)
+    to_view = args.view
+    if to_view is not None:
+        view_show(meta, db, to_view)
+        exit(0)
 
-    print(id)
     if args.latest:
         latest(meta, db, subs, only_tracked=args.tracked)
     elif args.weekday:

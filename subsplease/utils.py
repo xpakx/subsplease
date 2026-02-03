@@ -98,3 +98,9 @@ def latest(meta: MetadataProvider, db: AnimeDB,
     current = {x.sid: x for x in airing}
     episodes = subs.latest()
     display_latest(episodes.unwrap(), current, only_tracked)
+
+
+def view_show(meta: MetadataProvider, db: AnimeDB, title: str):
+    print(title)
+    result = meta.search_show(title).unwrap()
+    print(result)
