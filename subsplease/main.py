@@ -1,10 +1,7 @@
 from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
-from utils import (
-        latest, view_show,
-        Program
-)
+from utils import Program
 from torrent import send_magnet_to_transmission
 import argparse
 
@@ -68,11 +65,11 @@ if __name__ == "__main__":
         exit(0)
     to_view = args.view
     if to_view is not None:
-        view_show(meta, db, to_view)
+        program.view_show(to_view)
         exit(0)
 
     if args.latest:
-        latest(meta, db, subs, only_tracked=args.tracked)
+        program.latest()
     elif args.weekday:
         program.show_day(args.weekday)
     elif args.update:
