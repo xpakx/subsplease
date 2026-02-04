@@ -49,6 +49,7 @@ if __name__ == "__main__":
     db = AnimeDB()
     subs = Subsplease()
     program = Program(subs, meta, db)
+    program.load_shows()
     program.switch_only_tracked(args.tracked)
 
     id = args.download
