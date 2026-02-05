@@ -2,6 +2,7 @@ import subprocess
 from api import EpisodeData, DownloadData
 from transmission_rpc import Client
 from pathlib import Path
+import shutil
 
 
 def magnet(episode: EpisodeData, quality: str):
@@ -58,7 +59,7 @@ def check_torrent(torrent_id: int):
         print(f"Error: {e}")
 
 
-def move_torrent(torrent_id: int, dist: str):
+def move_torrent(torrent_id: int, dist: str, remove: bool = False):
     try:
         c = Client(
                 host='localhost',
@@ -76,6 +77,11 @@ def move_torrent(torrent_id: int, dist: str):
         dest_dir = Path.home() / "Videos" / "TV Series"/ dist
         dest_dir.mkdir(exist_ok=True)
         print(f"Moving data to {dest_dir} and updating Transmission path...")
-        c.move_torrent_data(torrent_id, str(dest_dir))
+        if not remove:
+            c.move_torrent_data(torrent_id, str(dest_dir))
+        else:
+            shutil.move(str(path), str(dest_dir / torrent.name))
+            c.remove_torrent(torrent_id, delete_data=False)
+            print("Torrent removed from client")
     except Exception as e:
         print(f"Error: {e}")
