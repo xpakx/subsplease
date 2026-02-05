@@ -36,3 +36,26 @@ def send_magnet_to_transmission(episode: EpisodeData, quality: str):
 
     except Exception as e:
         print(f"Error: {e}")
+
+
+def check_torrent(torrent_id: int):
+    try:
+        c = Client(
+                host='localhost',
+                port=9091,
+                username='test',
+                password='test_password'
+        )
+        torrent = c.get_torrent(torrent_id)
+        print(f"Found torrent: {torrent.name}")
+        is_done = torrent.percent_done == 1.0
+        if is_done:
+            print("Torrent finished")
+        else:
+            print(f"Done {torrent.percent_done * 100:.2f}%")
+
+        print(torrent.download_dir)
+
+    except Exception as e:
+        print(f"Error: {e}")
+    pass
