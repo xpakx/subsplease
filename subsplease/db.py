@@ -15,6 +15,15 @@ class LocalShow(msgspec.Struct):
     current: bool
 
 
+class LocalEpisode(msgspec.Struct):
+    id: int
+    show_id: int
+    episode: int
+    torrent_id: int | None
+    watched: bool
+    downloaded: bool
+
+
 class AnimeDB:
     def __init__(self, db_path: str = "ani.db"):
         self.db_path = db_path
@@ -33,6 +42,16 @@ class AnimeDB:
                     last_episode INTEGER DEFAULT 0,
                     tracking BOOLEAN DEFAULT 0,
                     current BOOLEAN DEFAULT 0
+                )
+            """)
+            con.execute("""
+                CREATE TABLE IF NOT EXISTS episodes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    torrent_id INTEGER NOT NULL,
+                    show_id INTEGER NOT NULL,
+                    torrent_id INTEGER,
+                    downloaded BOOLEAN DEFAULT 0,
+                    watched BOOLEAN DEFAULT 0
                 )
             """)
 
@@ -132,7 +151,7 @@ class AnimeDB:
                 con.row_factory = sqlite3.Row
                 print(sid)
                 cur = con.execute(
-                        "SELECT * FROM shows WHERE sid = ? LIMIT 1", 
+                        "SELECT * FROM shows WHERE sid = ? LIMIT 1",
                         (sid,))
                 r = cur.fetchone()
 
@@ -147,6 +166,45 @@ class AnimeDB:
                         tracking=bool(r['tracking']),
                         current=bool(r['current']))
 
+                return Ok(show)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def create_episode(self, show_id: int, episode: int) -> Result[bool, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.execute("""
+                    INSERT OR IGNORE INTO episodes (show_id, episode)
+                    VALUES (?, ?)
+                """, (show_id, episode))
+            return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def get_episode(self, show_id: str, episode: int
+                    ) -> Result[LocalEpisode, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute(
+                        """
+                        SELECT *
+                        FROM episodes
+                        WHERE show_id = ?
+                        AND episode = ?
+                        LIMIT 1
+                        """,
+                        (show_id, episode))
+                r = cur.fetchone()
+
+                show = LocalEpisode(
+                        id=r['id'],
+                        show_id=r['show_id'],
+                        episode=r['episode'],
+                        torrent_id=r['episode'],
+                        watched=bool(r['watched']),
+                        downloaded=bool(r['downloaded']),
+                )
                 return Ok(show)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
