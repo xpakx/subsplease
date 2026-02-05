@@ -1,6 +1,7 @@
 import subprocess
 from api import EpisodeData, DownloadData
 from transmission_rpc import Client
+from pathlib import Path
 
 
 def magnet(episode: EpisodeData, quality: str):
@@ -53,9 +54,28 @@ def check_torrent(torrent_id: int):
             print("Torrent finished")
         else:
             print(f"Done {torrent.percent_done * 100:.2f}%")
-
-        print(torrent.download_dir)
-
     except Exception as e:
         print(f"Error: {e}")
-    pass
+
+
+def move_torrent(torrent_id: int, dist: str):
+    try:
+        c = Client(
+                host='localhost',
+                port=9091,
+                username='test',
+                password='test_password'
+        )
+        torrent = c.get_torrent(torrent_id)
+        is_done = torrent.percent_done == 1.0
+        if not is_done:
+            return
+
+        path = Path(torrent.download_dir) / torrent.name
+        print(path)
+        dest_dir = Path.home() / "Videos" / "TV Series"/ dist
+        dest_dir.mkdir(exist_ok=True)
+        print(f"Moving data to {dest_dir} and updating Transmission path...")
+        c.move_torrent_data(torrent_id, str(dest_dir))
+    except Exception as e:
+        print(f"Error: {e}")
