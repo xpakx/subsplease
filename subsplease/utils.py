@@ -2,6 +2,8 @@ from api import Subsplease, ScheduleEntry
 from metadata import MetadataProvider
 from db import AnimeDB, LocalShow
 from display import display_schedule, display_latest, display_details
+import re
+import unicodedata
 
 
 class Program:
@@ -78,3 +80,26 @@ class Program:
         print(f"Searching '{title}'")
         result = self.meta.search_show_details(title).unwrap()
         display_details(result)
+
+    def get_show_dir(self, show: LocalShow) -> str | None:
+        name = show.title_english or show.title_romaji
+        if not name:
+            return
+        name = re.sub(r'(?i)\s*season\s+\d+', '', name)
+        name = re.sub(r'(?i)\s*s\d+\b', '', name)
+        if ':' in name:
+            name = name.split(':', maxsplit=1)[0]
+
+        name = unicodedata.normalize('NFKD', name)
+        name = name.encode('ascii', 'ignore').decode('ascii')
+        name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', ' ', name)
+        name = re.sub(r'\s+', ' ', name).strip()
+        name = name.strip('.')
+
+        if not name or name.isspace():
+            return
+
+        if name.isupper():
+            name = name.title()
+
+        return name
