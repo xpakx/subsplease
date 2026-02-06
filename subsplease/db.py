@@ -92,13 +92,13 @@ class AnimeDB:
 
     def db_to_object(self, obj_type, data):
         fields = msgspec.structs.fields(obj_type)
-        kwargs = {}
+        obj = {}
         for field in fields:
             value = data[field.name]
             if field.type == bool:
                 value = bool(value)
-            kwargs[field.name] = value
-        return LocalShow(**kwargs)
+            obj[field.name] = value
+        return msgspec.convert(obj, obj_type)
 
     def update_show(self, show: LocalShow) -> Result[bool, str]:
         try:

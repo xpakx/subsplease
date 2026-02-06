@@ -35,6 +35,7 @@ def send_magnet_to_transmission(episode: EpisodeData, quality: str):
         new_torrent = c.add_torrent(link.magnet)
         print(f"Success! Added torrent: {new_torrent.name}")
         print(f"ID: {new_torrent.id}")
+        print(f"ID: {new_torrent.hash_string}")
 
     except Exception as e:
         print(f"Error: {e}")
@@ -55,6 +56,24 @@ def check_torrent(torrent_id: int):
             print("Torrent finished")
         else:
             print(f"Done {torrent.percent_done * 100:.2f}%")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def list_torrents():
+    try:
+        c = Client(
+                host='localhost',
+                port=9091,
+                username='test',
+                password='test_password'
+        )
+        torrents = c.get_torrents()
+        for torrent in torrents:
+            print(f"[{torrent.id}] {torrent.name}")
+            is_done = torrent.percent_done == 1.0
+            if is_done:
+                print("Done.")
     except Exception as e:
         print(f"Error: {e}")
 
