@@ -88,8 +88,8 @@ class Program:
             return
         name = re.sub(r'(?i)\s*season\s+\d+', '', name)
         name = re.sub(r'(?i)\s*s\d+\b', '', name)
-        if ':' in name:
-            name = name.split(':', maxsplit=1)[0]
+        if ': ' in name:
+            name = name.split(': ', maxsplit=1)[0]
 
         name = unicodedata.normalize('NFKD', name)
         name = name.encode('ascii', 'ignore').decode('ascii')
