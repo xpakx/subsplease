@@ -1,0 +1,1 @@
+ALTER TABLE shows ADD COLUMN dir_name TEXT;

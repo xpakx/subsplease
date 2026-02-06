@@ -41,6 +41,7 @@ class Program:
             show.title_english = ani_list_show.title.english
             show.title_japanese = ani_list_show.title.native
             show.anilist_id = ani_list_show.id
+            show.dir_name = self.get_show_dir(show)
             self.db.update_show(show)
 
     def show_day(self, day: str):

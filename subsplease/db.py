@@ -12,6 +12,7 @@ class LocalShow(msgspec.Struct):
     title_english: str | None
     title_japanese: str | None
     episode: int
+    dir_name: str | None
     tracking: bool
     current: bool
 
@@ -90,6 +91,7 @@ class AnimeDB:
                         title_romaji=r['title_romaji'],
                         title_english=r['title_english'],
                         title_japanese=r['title_japanese'],
+                        dir_name=r['dir_name'],
                         episode=r['last_episode'],
                         tracking=bool(r['tracking']),
                         current=bool(r['current']),
@@ -108,6 +110,7 @@ class AnimeDB:
                         title_romaji = ?,
                         title_english = ?,
                         title_japanese = ?,
+                        dir_name = ?,
                         last_episode = ?,
                         tracking = ?,
                         current = ?
@@ -117,6 +120,7 @@ class AnimeDB:
                     show.title_romaji,
                     show.title_english,
                     show.title_japanese,
+                    show.dir_name,
                     show.episode,
                     show.tracking,
                     show.current,
@@ -171,6 +175,7 @@ class AnimeDB:
                         title_romaji=r['title_romaji'],
                         title_english=r['title_english'],
                         title_japanese=r['title_japanese'],
+                        dir_name=r['dir_name'],
                         episode=r['last_episode'],
                         tracking=bool(r['tracking']),
                         current=bool(r['current']))
