@@ -1,6 +1,7 @@
 import sqlite3
 import msgspec
 from result import Result, Ok, Err
+from pathlib import Path
 
 
 class LocalShow(msgspec.Struct):
@@ -27,33 +28,41 @@ class LocalEpisode(msgspec.Struct):
 class AnimeDB:
     def __init__(self, db_path: str = "ani.db"):
         self.db_path = db_path
-        self._init_db()
+        self._run_migrations()
 
-    def _init_db(self):
+    def _run_migrations(self):
         with sqlite3.connect(self.db_path) as con:
             con.execute("""
-                CREATE TABLE IF NOT EXISTS shows (
+                CREATE TABLE IF NOT EXISTS _migrations (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    sid TEXT UNIQUE NOT NULL,
-                    anilist_id INTEGER,
-                    title_romaji TEXT NOT NULL,
-                    title_english TEXT,
-                    title_japanese TEXT,
-                    last_episode INTEGER DEFAULT 0,
-                    tracking BOOLEAN DEFAULT 0,
-                    current BOOLEAN DEFAULT 0
+                    filename TEXT NOT NULL UNIQUE,
+                    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            con.execute("""
-                CREATE TABLE IF NOT EXISTS episodes (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    torrent_id INTEGER NOT NULL,
-                    show_id INTEGER NOT NULL,
-                    torrent_id INTEGER,
-                    downloaded BOOLEAN DEFAULT 0,
-                    watched BOOLEAN DEFAULT 0
-                )
-            """)
+            con.commit()
+
+            cur = con.execute("SELECT filename FROM _migrations")
+            applied = {row[0] for row in cur.fetchall()}
+
+            migration_dir = Path("migrations")
+            for sql_file in sorted(migration_dir.glob("*.sql")):
+                if sql_file.name in applied:
+                    continue
+
+                print(f"Applying migration from {sql_file.name}...")
+                try:
+                    con.execute("BEGIN")
+                    con.executescript(sql_file.read_text())
+                    con.execute("""
+                                INSERT INTO _migrations (filename)
+                                VALUES (?)
+                    """, (sql_file.name,))
+                    con.commit()
+                    print("  -> Success")
+                except Exception as e:
+                    con.rollback()
+                    print(f"  -> Failed: {e}")
+                    break
 
     def create_entry(self, sid: str, romaji: str) -> Result[bool, str]:
         try:
