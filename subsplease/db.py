@@ -11,7 +11,7 @@ class LocalShow(msgspec.Struct):
     title_romaji: str
     title_english: str | None
     title_japanese: str | None
-    episode: int
+    last_episode: int
     dir_name: str | None
     tracking: bool
     current: bool
@@ -84,22 +84,21 @@ class AnimeDB:
                 rows = cur.fetchall()
 
                 shows = [
-                    LocalShow(
-                        id=r['id'],
-                        sid=r['sid'],
-                        anilist_id=r['anilist_id'],
-                        title_romaji=r['title_romaji'],
-                        title_english=r['title_english'],
-                        title_japanese=r['title_japanese'],
-                        dir_name=r['dir_name'],
-                        episode=r['last_episode'],
-                        tracking=bool(r['tracking']),
-                        current=bool(r['current']),
-                    ) for r in rows
+                    self.db_to_object(LocalShow, r) for r in rows
                 ]
                 return Ok(shows)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def db_to_object(self, obj_type, data):
+        fields = msgspec.structs.fields(obj_type)
+        kwargs = {}
+        for field in fields:
+            value = data[field.name]
+            if field.type == bool:
+                value = bool(value)
+            kwargs[field.name] = value
+        return LocalShow(**kwargs)
 
     def update_show(self, show: LocalShow) -> Result[bool, str]:
         try:
@@ -121,7 +120,7 @@ class AnimeDB:
                     show.title_english,
                     show.title_japanese,
                     show.dir_name,
-                    show.episode,
+                    show.last_episode,
                     show.tracking,
                     show.current,
                     show.sid
@@ -168,18 +167,7 @@ class AnimeDB:
                         (sid,))
                 r = cur.fetchone()
 
-                show = LocalShow(
-                        id=r['id'],
-                        sid=r['sid'],
-                        anilist_id=r['anilist_id'],
-                        title_romaji=r['title_romaji'],
-                        title_english=r['title_english'],
-                        title_japanese=r['title_japanese'],
-                        dir_name=r['dir_name'],
-                        episode=r['last_episode'],
-                        tracking=bool(r['tracking']),
-                        current=bool(r['current']))
-
+                show = self.db_to_object(LocalShow, r)
                 return Ok(show)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
