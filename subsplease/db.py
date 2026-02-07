@@ -227,3 +227,64 @@ class AnimeDB:
                 return Ok(show)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def get_unfinished_downloads(self):
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute("""
+                                  SELECT *
+                                  FROM episodes
+                                  WHERE downloaded = 0
+                                  AND torrent_hash IS NOT NULL
+                                  """)
+                rows = cur.fetchall()
+
+                shows = [
+                    self.db_to_object(LocalEpisode, r) for r in rows
+                ]
+                return Ok(shows)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def get_all_eps(self):
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute("""
+                                  SELECT *
+                                  FROM episodes
+                                  """)
+                rows = cur.fetchall()
+
+                shows = [
+                    self.db_to_object(LocalEpisode, r) for r in rows
+                ]
+                return Ok(shows)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def update_episode(self, episode: LocalEpisode) -> Result[bool, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                cursor = con.execute("""
+                    UPDATE episodes
+                    SET show_id = ?,
+                        episode = ?,
+                        torrent_hash = ?,
+                        watched = ?,
+                        downloaded = ?
+                    WHERE id = ?
+                """, (
+                    episode.show_id,
+                    episode.episode,
+                    episode.torrent_hash,
+                    episode.watched,
+                    episode.downloaded,
+                    episode.id
+                ))
+                if cursor.rowcount == 0:
+                    return Err(f"Show with sid '{episode.id}' not found in DB.")
+            return Ok(True)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")

@@ -4,6 +4,7 @@ from db import AnimeDB, LocalShow
 from display import display_schedule, display_latest, display_details
 import re
 import unicodedata
+from torrent import check_torrent, move_torrent
 
 
 class Program:
@@ -104,3 +105,20 @@ class Program:
             name = name.title()
 
         return name
+
+    def get_local_show(self, id: int) -> LocalShow | None:
+        for show in self.current.values():
+            if show.id == id:
+                return show
+        return None
+
+    def check_downloads(self):
+        eps = self.db.get_unfinished_downloads().unwrap()
+        for ep in eps:
+            show = self.get_local_show(ep.show_id)
+            print(ep.episode, show.title_english)
+            finished = check_torrent(ep.torrent_hash)
+            if finished:
+                move_torrent(ep.torrent_hash, show.dir_name)
+                ep.downloaded = True
+                self.db.update_episode(ep)

@@ -20,7 +20,7 @@ def select_quality(episode: EpisodeData, quality: str) -> DownloadData | None:
     return None
 
 
-def send_magnet_to_transmission(episode: EpisodeData, quality: str):
+def send_magnet_to_transmission(episode: EpisodeData, quality: str) -> str:
     link = select_quality(episode, quality)
     if not link:
         return
@@ -36,12 +36,13 @@ def send_magnet_to_transmission(episode: EpisodeData, quality: str):
         print(f"Success! Added torrent: {new_torrent.name}")
         print(f"ID: {new_torrent.id}")
         print(f"ID: {new_torrent.hash_string}")
+        return new_torrent.hash_string
 
     except Exception as e:
         print(f"Error: {e}")
 
 
-def check_torrent(torrent_id: int):
+def check_torrent(torrent_id: int) -> bool:
     try:
         c = Client(
                 host='localhost',
@@ -54,10 +55,13 @@ def check_torrent(torrent_id: int):
         is_done = torrent.percent_done == 1.0
         if is_done:
             print("Torrent finished")
+            return True
         else:
             print(f"Done {torrent.percent_done * 100:.2f}%")
+            return False
     except Exception as e:
         print(f"Error: {e}")
+        return False
 
 
 def list_torrents():
@@ -93,8 +97,8 @@ def move_torrent(torrent_id: int, dist: str, remove: bool = False):
 
         path = Path(torrent.download_dir) / torrent.name
         print(path)
-        dest_dir = Path.home() / "Videos" / "TV Series"/ dist
-        dest_dir.mkdir(exist_ok=True)
+        dest_dir = Path.home() / "Videos" / "TV Series" / dist
+        dest_dir.mkdir(parents=True, exist_ok=True)
         print(f"Moving data to {dest_dir} and updating Transmission path...")
         if not remove:
             c.move_torrent_data(torrent_id, str(dest_dir))
