@@ -26,6 +26,14 @@ class Week(msgspec.Struct, rename='pascal'):
     saturday: list[ScheduleEntry]
     sunday: list[ScheduleEntry]
 
+    def __iter__(self):
+        for field in msgspec.structs.fields(self):
+            f = field.name
+            yield f, getattr(self, f)
+
+    def get_day(self, day: str) -> list[ScheduleEntry]:
+        return getattr(self, day.lower(), [])
+
 
 class WeeklySchedule(msgspec.Struct):
     tz: str

@@ -48,9 +48,9 @@ class Program:
     def show_day(self, day: str):
         res = self.subs.weekly_schedule()
         week = res.unwrap().schedule
-        if not hasattr(week, day):
+        day_list = week.get_day(day)
+        if not day_list:
             return
-        day_list = getattr(week, day)
         self.get_day(day_list)
         print(day.capitalize())
         display_schedule(day_list, self.current)
@@ -64,15 +64,10 @@ class Program:
                 self.fetch_show(show.title, local)
 
     def update_schedule(self):
-        res = self.subs.weekly_schedule()
-        week = res.unwrap().schedule
-        self.get_day(week.monday)
-        self.get_day(week.tuesday)
-        self.get_day(week.wednesday)
-        self.get_day(week.thursday)
-        self.get_day(week.friday)
-        self.get_day(week.saturday)
-        self.get_day(week.sunday)
+        res = self.subs.weekly_schedule().unwrap()
+        for day_name, day_list in res.schedule:
+            print(f"Updating {day_name.title()}")
+            self.get_day(day_list)
 
     def latest(self):
         episodes = self.subs.latest()
