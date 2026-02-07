@@ -172,13 +172,31 @@ class AnimeDB:
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
 
-    def create_episode(self, show_id: int, episode: int) -> Result[bool, str]:
+    def get_show_by_id(self, id: int) -> Result[LocalShow, str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute(
+                        "SELECT * FROM shows WHERE id = ? LIMIT 1",
+                        (id,))
+                r = cur.fetchone()
+
+                show = self.db_to_object(LocalShow, r)
+                return Ok(show)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")
+
+    def create_episode(
+            self, show_id: int, episode: int,
+            hash: str
+    ) -> Result[bool, str]:
         try:
             with sqlite3.connect(self.db_path) as con:
                 con.execute("""
-                    INSERT OR IGNORE INTO episodes (show_id, episode)
-                    VALUES (?, ?)
-                """, (show_id, episode))
+                    INSERT OR IGNORE
+                    INTO episodes (show_id, episode, torrent_hash)
+                    VALUES (?, ?, ?)
+                """, (show_id, episode, hash))
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")

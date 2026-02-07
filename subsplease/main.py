@@ -55,7 +55,11 @@ if __name__ == "__main__":
         print(len(data.unwrap()))
         data = [show for show in data.unwrap() if show.time == 'New']
         show = data[id]
-        send_magnet_to_transmission(show, str(args.quality))
+        hash = send_magnet_to_transmission(show, str(args.quality))
+        local = program.current.get(show.page)
+        print(local.title_english)
+        r = db.create_episode(local.id, int(show.episode), hash)
+        print(r)
         exit(0)
     id = args.subscribe
     if id is not None:
