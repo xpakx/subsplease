@@ -57,69 +57,56 @@ class Subsplease:
         self.scrap_url = "https://subsplease.org/shows/"
         self.timezone = timezone
 
+    def api_get(self, params: dict) -> Result[bytes, str]:
+        try:
+            params['tz'] = self.timezone
+            response = requests.get(self.url, params=params)
+
+            if response.status_code != 200:
+                return Err(f'HTTP Error {response.status_code}')
+            return Ok(response.content)
+
+        except requests.RequestException as e:
+            return Err(f"Network Error: {str(e)}")
+
     def schedule(self) -> Result[Schedule, str]:
-        url = f"{self.url}?f=schedule&h=true&tz={self.timezone}"
-        response = requests.get(url)
-        if response.status_code != 200:
-            return Err(f'Error {response.status_code} on request')
-        data = msgspec.json.decode(
-                response.content,
-                type=Schedule
+        response = self.api_get({'f': 'schedule', 'h': 'true'})
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=Schedule)
         )
-        return Ok(data)
 
     def weekly_schedule(self) -> Result[WeeklySchedule, str]:
-        url = f"{self.url}?f=schedule&tz={self.timezone}"
-        response = requests.get(url)
-        if response.status_code != 200:
-            return Err(f'Error {response.status_code} on request')
-        data = msgspec.json.decode(
-                response.content,
-                type=WeeklySchedule
+        response = self.api_get({'f': 'schedule'})
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=WeeklySchedule)
         )
-        return Ok(data)
 
     def latest(self, page: int | None = None
                ) -> Result[list[EpisodeData], str]:
-        url = f"{self.url}?f=latest&tz={self.timezone}"
+        params = {'f': 'latest'}
         if page is not None:
-            url += f'&p={page}'
-        response = requests.get(url)
-        if response.status_code != 200:
-            return Err(f'Error {response.status_code} on request')
-        data = msgspec.json.decode(
-                response.content,
-                type=dict[str, EpisodeData]
-        )
-        return Ok(list(data.values()))
+            params['p'] = page
+        response = self.api_get(params)
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=dict[str, EpisodeData])
+        ).map(lambda r: list(r.values()))
 
     def show(self, show_id: int) -> Result[ShowData, str]:
-        url = f"{self.url}?f=show&tz={self.timezone}&sid={show_id}"
-        response = requests.get(url)
-        if response.status_code != 200:
-            return Err(f'Error {response.status_code} on request')
-        data = msgspec.json.decode(
-                response.content,
-                type=ShowData
+        response = self.api_get({'f': 'show', 'sid': show_id})
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=ShowData)
         )
-        print(data)
-        return Ok(data)
 
     def search(self, query: str
                ) -> Result[list[EpisodeData], str]:
-        url = f"{self.url}?f=search&tz={self.timezone}&s={query}"
-        response = requests.get(url)
-        if response.status_code != 200:
-            return Err(f'Error {response.status_code} on request')
-        data = msgspec.json.decode(
-                response.content,
-                type=dict[str, EpisodeData]
-        )
-        return Ok(list(data.values()))
+        response = self.api_get({'f': 'search', 's': query})
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=dict[str, EpisodeData])
+        ).map(lambda r: list(r.values()))
 
     def get_sid(self, page: str) -> Result[int, str]:
         try:
-            url = f"{self.scrap_url}${page}"
+            url = f"{self.scrap_url}{page}"
             response = requests.get(url)
 
             if response.status_code != 200:

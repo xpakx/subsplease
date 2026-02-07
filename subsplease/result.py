@@ -55,6 +55,15 @@ class Result(Generic[T, E]):
         else:
             return Err(self.error)
 
+    def try_map(self, op: Callable[[T], U]) -> Result[U, E]:
+        if self.is_ok():
+            try:
+                return Ok(op(self.value))
+            except Exception as e:
+                return Err(str(e))
+        else:
+            return Err(self.error)
+
     def map_err(self, op: Callable[[E], F]) -> Result[T, F]:
         if self.is_ok():
             return Ok(self.value)
