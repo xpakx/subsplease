@@ -1,6 +1,7 @@
 import requests
 import msgspec
 from result import Result, Ok, Err
+from selectolax.parser import HTMLParser
 
 
 class ScheduleEntry(msgspec.Struct):
@@ -53,6 +54,7 @@ class ShowData(msgspec.Struct):
 class Subsplease:
     def __init__(self, timezone: str = 'Europe/Warsaw'):
         self.url = "https://subsplease.org/api/"
+        self.scrap_url = "https://subsplease.org/shows/"
         self.timezone = timezone
 
     def schedule(self) -> Result[Schedule, str]:
@@ -114,3 +116,26 @@ class Subsplease:
                 type=dict[str, EpisodeData]
         )
         return Ok(list(data.values()))
+
+    def get_sid(self, page: str) -> Result[int, str]:
+        try:
+            url = f"{self.scrap_url}${page}"
+            response = requests.get(url)
+
+            if response.status_code != 200:
+                return Err(f"HTTP Error: {response.status_code}")
+
+            tree = HTMLParser(response.text)
+            table = tree.css_first("table[id=show-release-table]")
+
+            if not table:
+                return Err("Table 'show-release-table' not found")
+
+            sid_value = table.attributes.get("sid", "")
+            if sid_value and sid_value.isdigit():
+                return Ok(int(sid_value))
+
+            return Err("Parameter 'sid' not found in table links")
+
+        except Exception as e:
+            return Err(str(e))
