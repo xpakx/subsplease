@@ -21,7 +21,7 @@ class LocalEpisode(msgspec.Struct):
     id: int
     show_id: int
     episode: int
-    torrent_id: int | None
+    torrent_hash: str | None
     watched: bool
     downloaded: bool
 
@@ -161,7 +161,6 @@ class AnimeDB:
         try:
             with sqlite3.connect(self.db_path) as con:
                 con.row_factory = sqlite3.Row
-                print(sid)
                 cur = con.execute(
                         "SELECT * FROM shows WHERE sid = ? LIMIT 1",
                         (sid,))
