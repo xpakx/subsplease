@@ -56,11 +56,12 @@ class Subsplease:
         self.url = "https://subsplease.org/api/"
         self.scrap_url = "https://subsplease.org/shows/"
         self.timezone = timezone
+        self.session = requests.Session()
 
     def api_get(self, params: dict) -> Result[bytes, str]:
         try:
             params['tz'] = self.timezone
-            response = requests.get(self.url, params=params)
+            response = self.session.get(self.url, params=params)
 
             if response.status_code != 200:
                 return Err(f'HTTP Error {response.status_code}')
@@ -107,7 +108,7 @@ class Subsplease:
     def get_sid(self, page: str) -> Result[int, str]:
         try:
             url = f"{self.scrap_url}{page}"
-            response = requests.get(url)
+            response = self.session.get(url)
 
             if response.status_code != 200:
                 return Err(f"HTTP Error: {response.status_code}")
