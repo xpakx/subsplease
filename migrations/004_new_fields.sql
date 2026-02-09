@@ -1,0 +1,2 @@
+ALTER TABLE shows ADD COLUMN subsplease_id INT;
+ALTER TABLE episodes ADD COLUMN started BOOLEAN DEFAULT 0;

@@ -134,8 +134,11 @@ class Program:
         show = self.select_show(query)
         if not show:
             return
-        show_id = self.subs.get_sid(show.sid).unwrap()
-        # TODO: save id to db
+        show_id = show.subsplease_id
+        if not show_id:
+            show_id = self.subs.get_sid(show.sid).unwrap()
+            show.subsplease_id = show_id
+            self.db.update_show(show)
         print(show_id)
         data = self.subs.show(show_id)
         episodes = list(data.unwrap().episode.values())

@@ -8,6 +8,7 @@ class LocalShow(msgspec.Struct):
     id: int
     sid: str   # subsplease link
     anilist_id: int | None
+    subsplease_id: int | None
     title_romaji: str
     title_english: str | None
     title_japanese: str | None
@@ -24,6 +25,7 @@ class LocalEpisode(msgspec.Struct):
     torrent_hash: str | None
     watched: bool
     downloaded: bool
+    started: bool
 
 
 class AnimeDB:
@@ -106,6 +108,7 @@ class AnimeDB:
                 cursor = con.execute("""
                     UPDATE shows
                     SET anilist_id = ?,
+                        subsplease_id = ?,
                         title_romaji = ?,
                         title_english = ?,
                         title_japanese = ?,
@@ -116,6 +119,7 @@ class AnimeDB:
                     WHERE sid = ?
                 """, (
                     show.anilist_id,
+                    show.subsplease_id,
                     show.title_romaji,
                     show.title_english,
                     show.title_japanese,
@@ -193,9 +197,9 @@ class AnimeDB:
             with sqlite3.connect(self.db_path) as con:
                 con.execute("""
                     INSERT OR IGNORE
-                    INTO episodes (show_id, episode, torrent_hash)
-                    VALUES (?, ?, ?)
-                """, (show_id, episode, hash))
+                    INTO episodes (show_id, episode, torrent_hash, started)
+                    VALUES (?, ?, ?, ?)
+                """, (show_id, episode, hash, True))
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
@@ -223,6 +227,7 @@ class AnimeDB:
                         torrent_id=r['episode'],
                         watched=bool(r['watched']),
                         downloaded=bool(r['downloaded']),
+                        started=bool(r['started']),
                 )
                 return Ok(show)
         except sqlite3.Error as e:
@@ -236,6 +241,7 @@ class AnimeDB:
                                   SELECT *
                                   FROM episodes
                                   WHERE downloaded = 0
+                                  WHERE started = 1
                                   AND torrent_hash IS NOT NULL
                                   """)
                 rows = cur.fetchall()
@@ -273,7 +279,8 @@ class AnimeDB:
                         episode = ?,
                         torrent_hash = ?,
                         watched = ?,
-                        downloaded = ?
+                        downloaded = ?,
+                        started = ?
                     WHERE id = ?
                 """, (
                     episode.show_id,
@@ -281,10 +288,11 @@ class AnimeDB:
                     episode.torrent_hash,
                     episode.watched,
                     episode.downloaded,
+                    episode.started,
                     episode.id
                 ))
                 if cursor.rowcount == 0:
-                    return Err(f"Show with sid '{episode.id}' not found in DB.")
+                    return Err(f"Episode '{episode.id}' not found in DB.")
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
