@@ -40,6 +40,9 @@ if __name__ == "__main__":
     parser.add_argument(
             '-v', '--view', type=str,
             help="Show to view")
+    parser.add_argument(
+            '-e', '--episodes', type=str,
+            help="Show to see episodes of")
 
     args = parser.parse_args()
     meta = MetadataProvider()
@@ -78,5 +81,7 @@ if __name__ == "__main__":
         program.show_day(args.weekday)
     elif args.update:
         program.update_schedule()
+    elif args.episodes:
+        program.show(args.episodes)
     else:
         program.today()

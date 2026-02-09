@@ -117,3 +117,14 @@ class Program:
                 move_torrent(ep.torrent_hash, show.dir_name)
                 ep.downloaded = True
                 self.db.update_episode(ep)
+
+    def show(self, page: str):
+        show = self.current.get(page)
+        if not show:
+            return
+        show_id = self.subs.get_sid(show.sid).unwrap()
+        # TODO: save id to db
+        print(show_id)
+        data = self.subs.show(show_id)
+        episodes = list(data.unwrap().episode.values())
+        display_latest(episodes, self.current)
