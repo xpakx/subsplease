@@ -6,6 +6,7 @@ import re
 import unicodedata
 from torrent import check_torrent, move_torrent
 from rapidfuzz import process, fuzz
+from rapidfuzz.utils import default_process
 
 
 class Program:
@@ -124,6 +125,7 @@ class Program:
         best_match = process.extractOne(
                 query,
                 options,
+                processor=default_process,
                 scorer=fuzz.WRatio)
         if best_match:
             _, _, index = best_match
@@ -132,6 +134,7 @@ class Program:
 
     def show(self, query: str):
         show = self.select_show(query)
+        print(show.title_english)
         if not show:
             return
         show_id = show.subsplease_id
