@@ -5,6 +5,7 @@ from display import display_schedule, display_latest, display_details
 import re
 import unicodedata
 from torrent import check_torrent, move_torrent
+from rapidfuzz import process, fuzz
 
 
 class Program:
@@ -118,8 +119,19 @@ class Program:
                 ep.downloaded = True
                 self.db.update_episode(ep)
 
-    def show(self, page: str):
-        show = self.current.get(page)
+    def select_show(self, query: str):
+        options = [self.current[x].title_english for x in self.current.keys()]
+        best_match = process.extractOne(
+                query,
+                options,
+                scorer=fuzz.WRatio)
+        if best_match:
+            _, _, index = best_match
+            key = list(self.current.keys())[index]
+            return self.current.get(key)
+
+    def show(self, query: str):
+        show = self.select_show(query)
         if not show:
             return
         show_id = self.subs.get_sid(show.sid).unwrap()
