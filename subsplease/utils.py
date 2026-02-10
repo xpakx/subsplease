@@ -160,7 +160,12 @@ class Program:
         r = self.db.create_episode(local.id, int(show.episode), hash)
         print(r)
 
-    def subscribe(self, id: int):
-        data = self.subs.schedule().unwrap().schedule
-        show = data[id]
-        show = self.db.toggle_tracking(show.page, True)
+    def select(self, query: str):
+        self.selection = self.select_show(query)
+
+    def subscribe(self, track: bool = True):
+        show = self.selection
+        if not show:
+            return
+        print(show.title_english)
+        show = self.db.toggle_tracking(show.sid, track)
