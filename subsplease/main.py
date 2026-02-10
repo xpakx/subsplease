@@ -3,6 +3,32 @@ from metadata import MetadataProvider
 from db import AnimeDB
 from utils import Program
 import argparse
+from datetime import datetime
+
+
+def get_day(weekday: str) -> str | None:
+    weekday = weekday.strip().lower()
+    if not weekday:
+        return None
+
+    days = ["monday", "tuesday", "wednesday", "thursday",
+            "friday", "saturday", "sunday"]
+    abbrs = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+    if weekday[0] in ("+", "-"):
+        try:
+            offset = int(weekday)
+            current_idx = datetime.now().weekday()
+            return days[(current_idx + offset) % 7]
+        except ValueError:
+            return None
+    if weekday.isdigit():
+        day = int(weekday)-1
+        return days[day % 7]
+    if weekday in abbrs:
+        return days[abbrs.index(weekday)]
+    if weekday in days:
+        return weekday
 
 
 if __name__ == "__main__":
@@ -58,6 +84,16 @@ if __name__ == "__main__":
             help="Unsubscribe show"
     )
 
+    day_show = subparsers.add_parser(
+            'day',
+            help='Operate on day'
+    )
+    day_show.add_argument(
+            'weekday',
+            type=str,
+            help='Weekday'
+    )
+
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB()
@@ -80,6 +116,12 @@ if __name__ == "__main__":
             else:
                 program.view_show(args.name)
         exit(0)
+
+    if args.command == 'day':
+        day = get_day(args.weekday)
+        if day:
+            program.show_day(day)
+        exit(0)
     to_view = args.view
     if to_view is not None:
         program.view_show(to_view)
@@ -88,7 +130,9 @@ if __name__ == "__main__":
     if args.latest:
         program.latest()
     elif args.weekday:
-        program.show_day(args.weekday)
+        day = get_day(args.weekday)
+        if day:
+            program.show_day(day)
     elif args.update:
         program.update_schedule()
     elif args.episodes:
