@@ -1,6 +1,17 @@
 import msgspec
 import requests
 from result import Result, Err, Ok
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+
+class AniListData(msgspec.Struct, Generic[T], rename='pascal'):
+    media: T
+
+
+class AniListResponse(msgspec.Struct, Generic[T]):
+    data: AniListData[T]
 
 
 class AniListTitle(msgspec.Struct):
@@ -12,14 +23,6 @@ class AniListTitle(msgspec.Struct):
 class AniListMedia(msgspec.Struct):
     id: int
     title: AniListTitle
-
-
-class AniListData(msgspec.Struct):
-    Media: AniListMedia
-
-
-class AniListResponse(msgspec.Struct):
-    data: AniListData
 
 
 class AniListTag(msgspec.Struct):
@@ -38,14 +41,6 @@ class AniListMediaDetails(msgspec.Struct):
     status: str
     nextAiringEpisode: AniListAiring | None
     tags: list[AniListTag]
-
-
-class AniListDetails(msgspec.Struct):
-    Media: AniListMediaDetails
-
-
-class AniListResponseDetails(msgspec.Struct):
-    data: AniListDetails
 
 
 class AniTitles(msgspec.Struct):
@@ -80,8 +75,11 @@ class MetadataProvider:
             return Err(f"AniList API Error: {response.status_code}")
 
         try:
-            data = msgspec.json.decode(response.content, type=AniListResponse)
-            return Ok(data.data.Media)
+            data = msgspec.json.decode(
+                    response.content,
+                    type=AniListResponse[AniListMedia]
+            )
+            return Ok(data.data.media)
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
 
@@ -136,7 +134,8 @@ class MetadataProvider:
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
 
-    def search_show_details(self, query: str) -> Result[AniListMediaDetails, str]:
+    def search_show_details(
+            self, query: str) -> Result[AniListMediaDetails, str]:
         query = query.replace('(JP)', '')
         query_string = """
         query ($search: String) {
@@ -167,7 +166,10 @@ class MetadataProvider:
             return Err(f"AniList API Error: {response.status_code}")
 
         try:
-            data = msgspec.json.decode(response.content, type=AniListResponseDetails)
-            return Ok(data.data.Media)
+            data = msgspec.json.decode(
+                    response.content,
+                    type=AniListResponse[AniListMediaDetails]
+            )
+            return Ok(data.data.media)
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
