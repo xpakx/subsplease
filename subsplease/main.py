@@ -2,16 +2,7 @@ from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
 from utils import Program
-from torrent import send_magnet_to_transmission
 import argparse
-
-
-def main():
-    pass
-    # send_magnet_to_transmission(latests[0], '720')
-    # res = subs.search("frieren")
-    # print(res.unwrap()[0])
-    # magnet(latests[0], '480')
 
 
 if __name__ == "__main__":
@@ -54,21 +45,11 @@ if __name__ == "__main__":
 
     id = args.download
     if id is not None:
-        data = subs.latest()
-        print(len(data.unwrap()))
-        data = [show for show in data.unwrap() if show.time == 'New']
-        show = data[id]
-        hash = send_magnet_to_transmission(show, str(args.quality))
-        local = program.current.get(show.page)
-        print(local.title_english)
-        r = db.create_episode(local.id, int(show.episode), hash)
-        print(r)
+        program.start_download(id, str(args.quality))
         exit(0)
     id = args.subscribe
     if id is not None:
-        data = subs.schedule().unwrap().schedule
-        show = data[id]
-        show = db.toggle_tracking(show.page, True)
+        program.subscribe(id)
         exit(0)
     to_view = args.view
     if to_view is not None:

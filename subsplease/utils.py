@@ -4,7 +4,7 @@ from db import AnimeDB, LocalShow
 from display import display_schedule, display_latest, display_details
 import re
 import unicodedata
-from torrent import check_torrent, move_torrent
+from torrent import check_torrent, move_torrent, send_magnet_to_transmission
 from rapidfuzz import process, fuzz
 from rapidfuzz.utils import default_process
 
@@ -146,3 +146,21 @@ class Program:
         data = self.subs.show(show_id)
         episodes = list(data.unwrap().episode.values())
         display_latest(episodes, self.current)
+
+    def start_download(self, id: int, quality: str):
+        data = self.subs.latest()
+        print(len(data.unwrap()))
+        data = [show for show in data.unwrap() if show.time == 'New']
+        show = data[id]
+        hash = send_magnet_to_transmission(show, quality)
+        if not hash:
+            return
+        local = self.current.get(show.page)
+        print(local.title_english)
+        r = self.db.create_episode(local.id, int(show.episode), hash)
+        print(r)
+
+    def subscribe(self, id: int):
+        data = self.subs.schedule().unwrap().schedule
+        show = data[id]
+        show = self.db.toggle_tracking(show.page, True)
