@@ -173,3 +173,43 @@ class MetadataProvider:
             return Ok(data.data.media)
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
+
+    def search_show_details_by_id(
+            self, id: int) -> Result[AniListMediaDetails, str]:
+        query_string = """
+        query ($mediaId: Int) {
+          Media (id: $mediaId, type: ANIME) {
+            id
+            title {
+              romaji
+              english
+              native
+            }
+            description(asHtml: false)
+            status
+            nextAiringEpisode {
+              airingAt
+              episode
+            }
+            tags { name }
+          }
+        }
+        """
+
+        response = requests.post(
+            self.url,
+            json={'query': query_string, 'variables': {'mediaId': id}}
+        )
+
+        if response.status_code != 200:
+            print(response.content)
+            return Err(f"AniList API Error: {response.status_code}")
+
+        try:
+            data = msgspec.json.decode(
+                    response.content,
+                    type=AniListResponse[AniListMediaDetails]
+            )
+            return Ok(data.data.media)
+        except msgspec.DecodeError as e:
+            return Err(f"Decode error: {e}")

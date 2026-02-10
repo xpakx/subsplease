@@ -163,9 +163,19 @@ class Program:
     def select(self, query: str):
         self.selection = self.select_show(query)
 
+    def is_show_selected(self):
+        return self.selection is not None
+
     def subscribe(self, track: bool = True):
         show = self.selection
         if not show:
             return
         print(show.title_english)
         show = self.db.toggle_tracking(show.sid, track)
+
+    def view_selected_show(self):
+        show = self.selection
+        if not show:
+            return
+        result = self.meta.search_show_details_by_id(show.anilist_id).unwrap()
+        display_details(result)

@@ -75,7 +75,10 @@ if __name__ == "__main__":
         if args.show_action in ['sub', 'subscribe']:
             program.subscribe(not args.unsubscribe)
         else:
-            program.view_show(args.name)
+            if program.is_show_selected():
+                program.view_selected_show()
+            else:
+                program.view_show(args.name)
         exit(0)
     to_view = args.view
     if to_view is not None:
