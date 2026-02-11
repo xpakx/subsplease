@@ -179,3 +179,18 @@ class Program:
             return
         result = self.meta.search_show_details_by_id(show.anilist_id).unwrap()
         display_details(result)
+
+    def show_episodes(self):
+        show = self.selection
+        if not show:
+            return
+        print(show.title_english)
+        show_id = show.subsplease_id
+        if not show_id:
+            show_id = self.subs.get_sid(show.sid).unwrap()
+            show.subsplease_id = show_id
+            self.db.update_show(show)
+        print(show_id)
+        data = self.subs.show(show_id)
+        episodes = list(data.unwrap().episode.values())
+        display_latest(episodes, self.current)

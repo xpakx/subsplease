@@ -83,6 +83,10 @@ if __name__ == "__main__":
             "-u", "--unsubscribe", action="store_true",
             help="Unsubscribe show"
     )
+    eps_for_show_sub = show_subparsers.add_parser(
+            'latest',
+            help='Latest episodes for the show'
+    )
 
     day_show = subparsers.add_parser(
             'day',
@@ -115,6 +119,8 @@ if __name__ == "__main__":
         program.select(args.name)
         if args.show_action in ['sub', 'subscribe']:
             program.subscribe(not args.unsubscribe)
+        elif args.show_action == 'latest':
+            program.show_episodes()
         else:
             if program.is_show_selected():
                 program.view_selected_show()
