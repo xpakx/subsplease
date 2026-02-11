@@ -241,7 +241,7 @@ class AnimeDB:
                                   SELECT *
                                   FROM episodes
                                   WHERE downloaded = 0
-                                  WHERE started = 1
+                                  AND started = 1
                                   AND torrent_hash IS NOT NULL
                                   """)
                 rows = cur.fetchall()
