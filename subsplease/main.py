@@ -94,6 +94,11 @@ if __name__ == "__main__":
             help='Weekday'
     )
 
+    parser_sync = subparsers.add_parser(
+            'sync',
+            help='Sync files'
+    )
+
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB()
@@ -115,6 +120,9 @@ if __name__ == "__main__":
                 program.view_selected_show()
             else:
                 program.view_show(args.name)
+        exit(0)
+    if args.command == 'sync':
+        program.check_downloads()
         exit(0)
 
     if args.command == 'day':
