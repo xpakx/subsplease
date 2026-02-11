@@ -87,6 +87,14 @@ if __name__ == "__main__":
             'latest',
             help='Latest episodes for the show'
     )
+    ep_get_sub = show_subparsers.add_parser(
+            'get',
+            help='get episode'
+    )
+    ep_get_sub.add_argument(
+            "-e", "--episode", type=int,
+            help="episode number"
+    )
 
     day_show = subparsers.add_parser(
             'day',
@@ -121,6 +129,12 @@ if __name__ == "__main__":
             program.subscribe(not args.unsubscribe)
         elif args.show_action == 'latest':
             program.show_episodes()
+        elif args.show_action == 'get':
+            if args.episode:
+                program.find_and_get_episode(args.episode)
+            else:
+                # TODO: latest/all undownloaded
+                pass
         else:
             if program.is_show_selected():
                 program.view_selected_show()

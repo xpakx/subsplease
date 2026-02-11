@@ -224,7 +224,7 @@ class AnimeDB:
                         id=r['id'],
                         show_id=r['show_id'],
                         episode=r['episode'],
-                        torrent_id=r['episode'],
+                        torrent_hash=r['torrent_hash'],
                         watched=bool(r['watched']),
                         downloaded=bool(r['downloaded']),
                         started=bool(r['started']),

@@ -180,6 +180,45 @@ class Program:
         result = self.meta.search_show_details_by_id(show.anilist_id).unwrap()
         display_details(result)
 
+    def find_and_get_episode(self, ep: int):
+        show = self.selection
+        if not show:
+            return
+        show_id = show.subsplease_id
+        if not show_id:
+            show_id = self.subs.get_sid(show.sid).unwrap()
+            show.subsplease_id = show_id
+            self.db.update_show(show)
+        data = self.subs.show(show_id)
+        episodes = list(data.unwrap().episode.values())
+        episode_to_get = None
+        for episode in episodes:
+            num = episode.episode
+            if not num.isdigit():
+                num = num.split('v')[0]
+            if not num.isdigit():
+                continue
+            num = int(num)
+            if num != ep:
+                continue
+            episode_to_get = episode
+            break
+        # print(episode_to_get)
+
+        local = self.db.get_episode(show.id, episode_to_get.episode)
+        if local.is_ok():
+            print("already downloaded")
+            return
+
+        hash = send_magnet_to_transmission(episode_to_get, 720)
+        hash = None
+        if not hash:
+            return
+        local = self.current.get(show.page)
+        print(local.title_english)
+        r = self.db.create_episode(local.id, int(show.episode), hash)
+        print(r)
+
     def show_episodes(self):
         show = self.selection
         if not show:
