@@ -71,6 +71,12 @@ class Program:
             print(f"Updating {day_name.title()}")
             self.get_day(day_list)
 
+    def show_schedule(self):
+        res = self.subs.weekly_schedule().unwrap()
+        for day_name, day_list in res.schedule:
+            print(day_name)
+            display_schedule(day_list, self.current)
+
     def latest(self):
         episodes = self.subs.latest()
         display_latest(episodes.unwrap(), self.current, self.only_tracked)

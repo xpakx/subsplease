@@ -139,7 +139,7 @@ if __name__ == "__main__":
         if args.season_action == 'update':
             program.update_schedule()
         else:
-            pass
+            program.show_schedule()
     else:
         program.today()
 
