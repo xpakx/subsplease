@@ -90,6 +90,18 @@ if __name__ == "__main__":
             help='Sync files'
     )
 
+    parser_season = subparsers.add_parser(
+            'season',
+            help='Weekly schedule'
+    )
+    season_subparsers = parser_season.add_subparsers(
+            dest='season_action'
+    )
+    parser_schedule_sync = season_subparsers.add_parser(
+            'update',
+            help='Update schedule'
+    )
+
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB()
@@ -123,10 +135,14 @@ if __name__ == "__main__":
         day = get_day(args.weekday)
         if day:
             program.show_day(day)
+    elif args.command == 'season':
+        if args.season_action == 'update':
+            program.update_schedule()
+        else:
+            pass
     else:
         program.today()
 
-    # TODO: day latest
     # to_view = args.view
     # if to_view is not None:
         # program.view_show(to_view)
@@ -135,6 +151,3 @@ if __name__ == "__main__":
     # TODO: day latest
     # if args.latest:
         # program.latest()
-    # TODO: season update
-    # elif args.update:
-        # program.update_schedule()
