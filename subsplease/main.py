@@ -2,8 +2,8 @@ from api import Subsplease
 from metadata import MetadataProvider
 from db import AnimeDB
 from utils import Program
-import argparse
 from datetime import datetime
+from parser import get_parser
 
 
 def get_day(weekday: str) -> str | None:
@@ -32,76 +32,7 @@ def get_day(weekday: str) -> str | None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="")
-    # parser.add_argument(
-    # "-t", "--tracked", action="store_true",
-    # help="Show only tracked")
-
-    subparsers = parser.add_subparsers(
-            dest='command',
-            help='Available commands')
-    parser_show = subparsers.add_parser(
-            'show',
-            aliases=['s'],
-            help='Operate on show'
-    )
-    parser_show.add_argument(
-            'name',
-            type=str,
-            help='Name of the show'
-    )
-    show_subparsers = parser_show.add_subparsers(
-            dest='show_action'
-    )
-    parser_sub = show_subparsers.add_parser(
-            'subscribe',
-            aliases=['sub'],
-            help='Subscribe'
-    )
-    parser_sub.add_argument(
-            "-u", "--unsubscribe", action="store_true",
-            help="Unsubscribe show"
-    )
-    eps_for_show_sub = show_subparsers.add_parser(
-            'latest',
-            help='Latest episodes for the show'
-    )
-    ep_get_sub = show_subparsers.add_parser(
-            'get',
-            help='get episode'
-    )
-    ep_get_sub.add_argument(
-            "-e", "--episode", type=int,
-            help="episode number"
-    )
-
-    day_show = subparsers.add_parser(
-            'day',
-            help='Operate on day'
-    )
-    day_show.add_argument(
-            'weekday',
-            type=str,
-            help='Weekday'
-    )
-
-    parser_sync = subparsers.add_parser(
-            'sync',
-            help='Sync files'
-    )
-
-    parser_season = subparsers.add_parser(
-            'season',
-            help='Weekly schedule'
-    )
-    season_subparsers = parser_season.add_subparsers(
-            dest='season_action'
-    )
-    parser_schedule_sync = season_subparsers.add_parser(
-            'update',
-            help='Update schedule'
-    )
-
+    parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB()
