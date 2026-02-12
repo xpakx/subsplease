@@ -219,6 +219,8 @@ class AnimeDB:
                         """,
                         (show_id, episode))
                 r = cur.fetchone()
+                if r is None:
+                    return Err('')
 
                 show = LocalEpisode(
                         id=r['id'],

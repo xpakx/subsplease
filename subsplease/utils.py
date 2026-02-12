@@ -210,13 +210,11 @@ class Program:
             print("already downloaded")
             return
 
-        hash = send_magnet_to_transmission(episode_to_get, 720)
-        hash = None
+        hash = send_magnet_to_transmission(episode_to_get, "720")
         if not hash:
             return
-        local = self.current.get(show.page)
-        print(local.title_english)
-        r = self.db.create_episode(local.id, int(show.episode), hash)
+        print(show.title_english)
+        r = self.db.create_episode(show.id, int(episode_to_get.episode), hash)
         print(r)
 
     def show_episodes(self):
