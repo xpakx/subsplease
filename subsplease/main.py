@@ -96,7 +96,7 @@ if __name__ == "__main__":
     subs = Subsplease()
     program = Program(subs, meta, db)
     program.load_shows()
-    program.switch_only_tracked(args.tracked)
+    # program.switch_only_tracked(args.tracked)
 
     if args.command in ['show', 's']:
         program.select(args.name)
