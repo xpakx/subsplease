@@ -4,6 +4,8 @@ from db import AnimeDB
 from utils import Program
 from datetime import datetime
 from parser import get_parser
+import os
+from pathlib import Path
 
 
 def get_day(weekday: str) -> str | None:
@@ -31,11 +33,23 @@ def get_day(weekday: str) -> str | None:
         return weekday
 
 
+def get_db_location() -> str:
+    path_str = os.environ.get('XDG_CACHE_HOME')
+    if path_str:
+        path_str = Path(path_str)
+    else:
+        home = os.environ.get('HOME')
+        path_str = Path(home) / '.cache'
+    path = path_str / 'subsplease'
+    print('path', path)
+    return path
+
+
 if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
-    db = AnimeDB()
+    db = AnimeDB(db_path=get_db_location())
     subs = Subsplease()
     program = Program(subs, meta, db)
     program.load_shows()
