@@ -33,23 +33,35 @@ def get_day(weekday: str) -> str | None:
         return weekday
 
 
-def get_db_location() -> str:
-    path_str = os.environ.get('XDG_CACHE_HOME')
+def get_xdg(var: str, default: Path) -> str:
+    path_str = os.environ.get(var)
     if path_str:
         path_str = Path(path_str)
     else:
         home = os.environ.get('HOME')
-        path_str = Path(home) / '.cache'
+        path_str = Path(home) / default
     path = path_str / 'subsplease'
     print('path', path)
     return path
+
+
+def get_config_location() -> str:
+    return get_xdg('XDG_CONFIG_HOME', '.config')
+
+
+def get_cache_location() -> str:
+    return get_xdg('XDG_CACHE_HOME', '.cache')
+
+
+def get_data_location() -> str:
+    return get_xdg('XDG_DATA_HOME', '.local/share')
 
 
 if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
-    db = AnimeDB(db_path=get_db_location())
+    db = AnimeDB(db_path=get_data_location())
     subs = Subsplease()
     program = Program(subs, meta, db)
     program.load_shows()
