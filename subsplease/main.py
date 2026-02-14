@@ -5,26 +5,61 @@ from subsplease.utils import Program
 from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location
+from inspect import signature
 
 
-def subscribe(program, name, unsubscribe):
+class CommandDispatcher:
+    def __init__(self):
+        self.commands = {}
+
+    def register(self, name, command):
+        self.commands[name] = command
+
+    def dispatch(self, name, service, args):
+        cmd = self.commands.get(name)
+        if not cmd:
+            return
+        sig = signature(cmd)
+        sig = list(sig.parameters.keys())
+        # TODO: for now, we assume first one is service
+        kwargs = {}
+        vs = vars(args)
+        for elem in sig[1:]:
+            kwargs[elem] = vs.get(elem)
+        if cmd:
+            cmd(service, **kwargs)
+
+
+dispatcher = CommandDispatcher()
+
+
+def command(f):
+    dispatcher.register(f.__name__, f)
+    return f
+
+
+@command
+def subscribe(program: Program, name: str, unsubscribe: bool):
     program.select(name)
     program.subscribe(not unsubscribe)
 
 
-def show_latest(program, name):
+@command
+def show_latest(program: Program, name: str):
     program.select(name)
     program.show_episodes()
 
 
-def show_get(program, name, episode):
+@command
+def show_get(program: Program, name: str, episode: int):
     program.select(name)
     if episode:
         program.find_and_get_episode(episode)
     # TODO: latest/all undownloaded
 
 
-def show_view(program, name):
+@command
+def show_view(program: Program, name: str):
     program.select(name)
     if program.is_show_selected():
         program.view_selected_show()
@@ -44,13 +79,13 @@ def main():
 
     if args.command in ['show', 's']:
         if args.show_action in ['sub', 'subscribe']:
-            subscribe(program, args.name, args.unsubscribe)
+            dispatcher.dispatch('subscribe', program, args)
         elif args.show_action == 'latest':
-            show_latest(program, args.name)
+            dispatcher.dispatch('show_latest', program, args)
         elif args.show_action == 'get':
-            show_get(program, args.name, args.episode)
+            dispatcher.dispatch('show_get', program, args)
         else:
-            show_view(program, args.name)
+            dispatcher.dispatch('show_view', program, args)
 
     elif args.command == 'sync':
         program.check_downloads()
