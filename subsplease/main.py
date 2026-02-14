@@ -7,6 +7,31 @@ from subsplease.date import get_day
 from subsplease.config import get_data_location
 
 
+def subscribe(program, name, unsubscribe):
+    program.select(name)
+    program.subscribe(not unsubscribe)
+
+
+def show_latest(program, name):
+    program.select(name)
+    program.show_episodes()
+
+
+def show_get(program, name, episode):
+    program.select(name)
+    if episode:
+        program.find_and_get_episode(episode)
+    # TODO: latest/all undownloaded
+
+
+def show_view(program, name):
+    program.select(name)
+    if program.is_show_selected():
+        program.view_selected_show()
+    else:
+        program.view_show(name)
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()
@@ -18,22 +43,14 @@ def main():
     # program.switch_only_tracked(args.tracked)
 
     if args.command in ['show', 's']:
-        program.select(args.name)
         if args.show_action in ['sub', 'subscribe']:
-            program.subscribe(not args.unsubscribe)
+            subscribe(program, args.name, args.unsubscribe)
         elif args.show_action == 'latest':
-            program.show_episodes()
+            show_latest(program, args.name)
         elif args.show_action == 'get':
-            if args.episode:
-                program.find_and_get_episode(args.episode)
-            else:
-                # TODO: latest/all undownloaded
-                pass
+            show_get(program, args.name, args.episode)
         else:
-            if program.is_show_selected():
-                program.view_selected_show()
-            else:
-                program.view_show(args.name)
+            show_view(program, args.name)
 
     elif args.command == 'sync':
         program.check_downloads()
