@@ -1,10 +1,10 @@
-from api import Subsplease, ScheduleEntry
-from metadata import MetadataProvider
-from db import AnimeDB, LocalShow
-from display import display_schedule, display_latest, display_details
+from subsplease.api import Subsplease, ScheduleEntry
+from subsplease.metadata import MetadataProvider
+from subsplease.db import AnimeDB, LocalShow
+from subsplease.display import display_schedule, display_latest, display_details
 import re
 import unicodedata
-from torrent import check_torrent, move_torrent, send_magnet_to_transmission
+from subsplease.torrent import check_torrent, move_torrent, send_magnet_to_transmission
 from rapidfuzz import process, fuzz
 from rapidfuzz.utils import default_process
 

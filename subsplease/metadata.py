@@ -1,6 +1,6 @@
 import msgspec
 import requests
-from result import Result, Err, Ok
+from subsplease.result import Result, Err, Ok
 from typing import Generic, TypeVar
 
 T = TypeVar("T")

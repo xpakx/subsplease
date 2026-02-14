@@ -259,7 +259,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/9e/bd/3704a8c3e0942d711
 [[package]]
 name = "subsplease"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "feedparser" },
     { name = "msgspec" },

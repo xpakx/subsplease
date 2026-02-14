@@ -1,5 +1,5 @@
 import subprocess
-from api import EpisodeData, DownloadData
+from subsplease.api import EpisodeData, DownloadData
 from transmission_rpc import Client
 from pathlib import Path
 import shutil

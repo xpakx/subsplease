@@ -1,9 +1,9 @@
-from api import Subsplease
-from metadata import MetadataProvider
-from db import AnimeDB
-from utils import Program
+from subsplease.api import Subsplease
+from subsplease.metadata import MetadataProvider
+from subsplease.db import AnimeDB
+from subsplease.utils import Program
 from datetime import datetime
-from parser import get_parser
+from subsplease.parser import get_parser
 import os
 from pathlib import Path
 
@@ -57,7 +57,7 @@ def get_data_location() -> str:
     return get_xdg('XDG_DATA_HOME', '.local/share')
 
 
-if __name__ == "__main__":
+def main():
     parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
@@ -108,3 +108,7 @@ if __name__ == "__main__":
     # TODO: day latest
     # if args.latest:
         # program.latest()
+
+
+if __name__ == "__main__":
+    main()

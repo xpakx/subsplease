@@ -3,7 +3,16 @@
 all: run
 
 run:
-	uv run subsplease/main.py
+	uv run -m subsplease.main
 
 mypy:
 	uvx mypy subsplease/
+
+build:
+	uv build
+
+install: build
+	uv tool install --editable . --force
+
+uninstall:
+	uv tool uninstall subsplease

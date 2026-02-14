@@ -1,6 +1,6 @@
 import requests
 import msgspec
-from result import Result, Ok, Err
+from subsplease.result import Result, Ok, Err
 from selectolax.parser import HTMLParser
 
 

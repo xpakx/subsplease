@@ -1,6 +1,6 @@
 import feedparser
 import urllib
-from result import Result, Ok
+from subsplease.result import Result, Ok
 from dataclasses import dataclass
 
 

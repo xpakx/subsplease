@@ -1,6 +1,6 @@
-from api import Schedule, ScheduleEntry, EpisodeData
-from db import LocalShow
-from metadata import AniListMediaDetails
+from subsplease.api import Schedule, ScheduleEntry, EpisodeData
+from subsplease.db import LocalShow
+from subsplease.metadata import AniListMediaDetails
 from rich.console import Console
 from rich.table import Table
 from rich import box

@@ -1,6 +1,6 @@
 import sqlite3
 import msgspec
-from result import Result, Ok, Err
+from subsplease.result import Result, Ok, Err
 from pathlib import Path
 
 
