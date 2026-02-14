@@ -2,59 +2,9 @@ from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
 from subsplease.utils import Program
-from datetime import datetime
 from subsplease.parser import get_parser
-import os
-from pathlib import Path
-
-
-def get_day(weekday: str) -> str | None:
-    weekday = weekday.strip().lower()
-    if not weekday:
-        return None
-
-    days = ["monday", "tuesday", "wednesday", "thursday",
-            "friday", "saturday", "sunday"]
-    abbrs = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-
-    if weekday[0] in ("+", "-"):
-        try:
-            offset = int(weekday)
-            current_idx = datetime.now().weekday()
-            return days[(current_idx + offset) % 7]
-        except ValueError:
-            return None
-    if weekday.isdigit():
-        day = int(weekday)-1
-        return days[day % 7]
-    if weekday in abbrs:
-        return days[abbrs.index(weekday)]
-    if weekday in days:
-        return weekday
-
-
-def get_xdg(var: str, default: Path) -> str:
-    path_str = os.environ.get(var)
-    if path_str:
-        path_str = Path(path_str)
-    else:
-        home = os.environ.get('HOME')
-        path_str = Path(home) / default
-    path = path_str / 'subsplease'
-    print('path', path)
-    return path
-
-
-def get_config_location() -> str:
-    return get_xdg('XDG_CONFIG_HOME', '.config')
-
-
-def get_cache_location() -> str:
-    return get_xdg('XDG_CACHE_HOME', '.cache')
-
-
-def get_data_location() -> str:
-    return get_xdg('XDG_DATA_HOME', '.local/share')
+from subsplease.date import get_day
+from subsplease.config import get_data_location
 
 
 def main():
