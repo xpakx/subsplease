@@ -77,15 +77,9 @@ def main():
     program.load_shows()
     # program.switch_only_tracked(args.tracked)
 
-    if args.command in ['show', 's']:
-        if args.show_action in ['sub', 'subscribe']:
-            dispatcher.dispatch('subscribe', program, args)
-        elif args.show_action == 'latest':
-            dispatcher.dispatch('show_latest', program, args)
-        elif args.show_action == 'get':
-            dispatcher.dispatch('show_get', program, args)
-        else:
-            dispatcher.dispatch('show_view', program, args)
+    cmd_key = getattr(args, 'cmd_key', None)
+    if cmd_key:
+        dispatcher.dispatch(args.cmd_key, program, args)
 
     elif args.command == 'sync':
         program.check_downloads()

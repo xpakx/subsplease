@@ -20,6 +20,7 @@ def get_parser() -> argparse.ArgumentParser:
             type=str,
             help='Name of the show'
     )
+    parser_show.set_defaults(cmd_key='show_view')
     show_subparsers = parser_show.add_subparsers(
             dest='show_action'
     )
@@ -28,6 +29,7 @@ def get_parser() -> argparse.ArgumentParser:
             aliases=['sub'],
             help='Subscribe'
     )
+    parser_sub.set_defaults(cmd_key='subscribe')
     parser_sub.add_argument(
             "-u", "--unsubscribe", action="store_true",
             help="Unsubscribe show"
@@ -36,10 +38,12 @@ def get_parser() -> argparse.ArgumentParser:
             'latest',
             help='Latest episodes for the show'
     )
+    eps_for_show_sub.set_defaults(cmd_key='show_latest')
     ep_get_sub = show_subparsers.add_parser(
             'get',
             help='get episode'
     )
+    ep_get_sub.set_defaults(cmd_key='show_get')
     ep_get_sub.add_argument(
             "-e", "--episode", type=int,
             help="episode number"
