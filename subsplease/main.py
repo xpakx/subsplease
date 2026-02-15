@@ -41,28 +41,27 @@ class CommandDispatcher:
             kwargs[elem] = vs.get(elem)
         cmd.func(service, **kwargs)
 
+    def command(self, f):
+        self.register(f.__name__, f)
+        return f
+
 
 dispatcher = CommandDispatcher()
 
 
-def command(f):
-    dispatcher.register(f.__name__, f)
-    return f
-
-
-@command
+@dispatcher.command
 def subscribe(program: Program, name: str, unsubscribe: bool):
     program.select(name)
     program.subscribe(not unsubscribe)
 
 
-@command
+@dispatcher.command
 def show_latest(program: Program, name: str):
     program.select(name)
     program.show_episodes()
 
 
-@command
+@dispatcher.command
 def show_get(program: Program, name: str, episode: int):
     program.select(name)
     if episode:
@@ -70,7 +69,7 @@ def show_get(program: Program, name: str, episode: int):
     # TODO: latest/all undownloaded
 
 
-@command
+@dispatcher.command
 def show_view(program: Program, name: str):
     program.select(name)
     if program.is_show_selected():
@@ -79,29 +78,29 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
-@command
+@dispatcher.command
 def day(program: Program, weekday: str):
     day = get_day(weekday)
     if day:
         program.show_day(day)
 
 
-@command
+@dispatcher.command
 def sync(program: Program):
     program.check_downloads()
 
 
-@command
+@dispatcher.command
 def show_season(program: Program):
     program.show_schedule()
 
 
-@command
+@dispatcher.command
 def update_season(program: Program):
     program.update_schedule()
 
 
-@command
+@dispatcher.command
 def today(program: Program):
     program.today()
 
