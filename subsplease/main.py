@@ -6,28 +6,40 @@ from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location
 from inspect import signature
+from dataclasses import dataclass
+from typing import Callable
+
+
+@dataclass
+class CommandDefiniton:
+    name: str
+    arguments: list[str]
+    func: Callable
 
 
 class CommandDispatcher:
     def __init__(self):
-        self.commands = {}
+        self.commands: dict[str, CommandDefiniton] = {}
 
-    def register(self, name, command):
-        self.commands[name] = command
+    def register(self, name: str, command: Callable):
+        sig = signature(command)
+        args = list(sig.parameters.keys())
+        cmd_def = CommandDefiniton(
+                name=name,
+                func=command,
+                arguments=args[1:]
+        )
+        self.commands[name] = cmd_def
 
     def dispatch(self, name, service, args):
         cmd = self.commands.get(name)
         if not cmd:
             return
-        sig = signature(cmd)
-        sig = list(sig.parameters.keys())
-        # TODO: for now, we assume first one is service
         kwargs = {}
         vs = vars(args)
-        for elem in sig[1:]:
+        for elem in cmd.arguments:
             kwargs[elem] = vs.get(elem)
-        if cmd:
-            cmd(service, **kwargs)
+        cmd.func(service, **kwargs)
 
 
 dispatcher = CommandDispatcher()
