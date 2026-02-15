@@ -5,8 +5,8 @@ all: run
 run:
 	uv run -m subsplease.main
 
-mypy:
-	uvx mypy subsplease/
+types:
+	uv run pyrefly check
 
 build:
 	uv build
