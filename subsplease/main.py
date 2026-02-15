@@ -79,6 +79,33 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
+@command
+def day(program: Program, weekday: str):
+    day = get_day(weekday)
+    if day:
+        program.show_day(day)
+
+
+@command
+def sync(program: Program):
+    program.check_downloads()
+
+
+@command
+def show_season(program: Program):
+    program.show_schedule()
+
+
+@command
+def update_season(program: Program):
+    program.update_schedule()
+
+
+@command
+def today(program: Program):
+    program.today()
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()
@@ -92,21 +119,6 @@ def main():
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:
         dispatcher.dispatch(args.cmd_key, program, args)
-
-    elif args.command == 'sync':
-        program.check_downloads()
-
-    elif args.command == 'day':
-        day = get_day(args.weekday)
-        if day:
-            program.show_day(day)
-    elif args.command == 'season':
-        if args.season_action == 'update':
-            program.update_schedule()
-        else:
-            program.show_schedule()
-    else:
-        program.today()
 
     # to_view = args.view
     # if to_view is not None:

@@ -6,6 +6,7 @@ def get_parser() -> argparse.ArgumentParser:
     # parser.add_argument(
     # "-t", "--tracked", action="store_true",
     # help="Show only tracked")
+    parser.set_defaults(cmd_key='today')
 
     subparsers = parser.add_subparsers(
             dest='command',
@@ -53,6 +54,7 @@ def get_parser() -> argparse.ArgumentParser:
             'day',
             help='Operate on day'
     )
+    day_show.set_defaults(cmd_key='day')
     day_show.add_argument(
             'weekday',
             type=str,
@@ -63,11 +65,13 @@ def get_parser() -> argparse.ArgumentParser:
             'sync',
             help='Sync files'
     )
+    parser_sync.set_defaults(cmd_key='sync')
 
     parser_season = subparsers.add_parser(
             'season',
             help='Weekly schedule'
     )
+    parser_season.set_defaults(cmd_key='show_season')
     season_subparsers = parser_season.add_subparsers(
             dest='season_action'
     )
@@ -75,4 +79,5 @@ def get_parser() -> argparse.ArgumentParser:
             'update',
             help='Update schedule'
     )
+    parser_schedule_sync.set_defaults(cmd_key='update_season')
     return parser
