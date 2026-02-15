@@ -20,7 +20,8 @@ def select_quality(episode: EpisodeData, quality: str) -> DownloadData | None:
     return None
 
 
-def send_magnet_to_transmission(episode: EpisodeData, quality: str) -> str:
+def send_magnet_to_transmission(episode: EpisodeData, quality: str
+                                ) -> str | None:
     link = select_quality(episode, quality)
     if not link:
         return

@@ -1,10 +1,18 @@
 from subsplease.api import Subsplease, ScheduleEntry
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB, LocalShow
-from subsplease.display import display_schedule, display_latest, display_details
+from subsplease.display import (
+        display_schedule,
+        display_latest,
+        display_details
+)
 import re
 import unicodedata
-from subsplease.torrent import check_torrent, move_torrent, send_magnet_to_transmission
+from subsplease.torrent import (
+        check_torrent,
+        move_torrent,
+        send_magnet_to_transmission
+)
 from rapidfuzz import process, fuzz
 from rapidfuzz.utils import default_process
 
@@ -40,7 +48,7 @@ class Program:
         print("Fetching")
         result = self.meta.search_show(title)
         if result.is_ok():
-            ani_list_show = result.ok()
+            ani_list_show = result.unwrap()
             show.title_english = ani_list_show.title.english
             show.title_japanese = ani_list_show.title.native
             show.anilist_id = ani_list_show.id
@@ -119,6 +127,10 @@ class Program:
         eps = self.db.get_unfinished_downloads().unwrap()
         for ep in eps:
             show = self.get_local_show(ep.show_id)
+            if not show:
+                continue
+            if not show.dir_name:
+                continue
             print(ep.episode, show.title_english)
             finished = check_torrent(ep.torrent_hash)
             if finished:
@@ -140,6 +152,8 @@ class Program:
 
     def show(self, query: str):
         show = self.select_show(query)
+        if not show:
+            return
         print(show.title_english)
         if not show:
             return
@@ -162,6 +176,8 @@ class Program:
         if not hash:
             return
         local = self.current.get(show.page)
+        if not local:
+            return
         print(local.title_english)
         r = self.db.create_episode(local.id, int(show.episode), hash)
         print(r)
@@ -183,6 +199,9 @@ class Program:
         show = self.selection
         if not show:
             return
+        if not show.anilist_id:
+            # TODO: get id
+            return
         result = self.meta.search_show_details_by_id(show.anilist_id).unwrap()
         display_details(result)
 
@@ -198,6 +217,7 @@ class Program:
         data = self.subs.show(show_id)
         episodes = list(data.unwrap().episode.values())
         episode_to_get = None
+        episode_num = None
         for episode in episodes:
             num = episode.episode
             if not num.isdigit():
@@ -208,10 +228,14 @@ class Program:
             if num != ep:
                 continue
             episode_to_get = episode
+            episode_num = num
             break
         # print(episode_to_get)
+        if not episode_to_get or not episode_num:
+            print("Couldn't find episode")
+            return
 
-        local = self.db.get_episode(show.id, episode_to_get.episode)
+        local = self.db.get_episode(show.id, episode_num)
         if local.is_ok():
             print("already downloaded")
             return
@@ -220,7 +244,7 @@ class Program:
         if not hash:
             return
         print(show.title_english)
-        r = self.db.create_episode(show.id, int(episode_to_get.episode), hash)
+        r = self.db.create_episode(show.id, episode_num, hash)
         print(r)
 
     def show_episodes(self):

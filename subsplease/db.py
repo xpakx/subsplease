@@ -204,7 +204,7 @@ class AnimeDB:
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
 
-    def get_episode(self, show_id: str, episode: int
+    def get_episode(self, show_id: int, episode: int
                     ) -> Result[LocalEpisode, str]:
         try:
             with sqlite3.connect(self.db_path) as con:
