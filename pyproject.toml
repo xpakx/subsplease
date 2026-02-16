@@ -19,6 +19,9 @@ project-includes = [
     "**/*.py*",
     "**/*.ipynb",
 ]
+project-excludes = [
+    "**/result.py",
+]
 
 [build-system]
 requires = ["hatchling"]
