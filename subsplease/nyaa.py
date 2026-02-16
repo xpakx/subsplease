@@ -1,7 +1,8 @@
 import feedparser
-import urllib
+from urllib import parse
 from subsplease.result import Result, Ok
 from dataclasses import dataclass
+from typing import cast
 
 
 @dataclass
@@ -25,7 +26,7 @@ def create_magnet(info_hash, title):
             'udp://tracker.torrent.eu.org:451/announce'
         ]
     }
-    return f"magnet:?{urllib.parse.urlencode(magnet_data, doseq=True)}"
+    return f"magnet:?{parse.urlencode(magnet_data, doseq=True)}"
 
 
 def nyaa_newest(query: str, quality: int | None = None
@@ -33,7 +34,7 @@ def nyaa_newest(query: str, quality: int | None = None
     if quality:
         query += f" {quality}p"
     print(query)
-    query = urllib.parse.quote_plus(query)
+    query = parse.quote_plus(query)
     rss_url = f"https://nyaa.si/?page=rss&q={query}&c=1_2&f=0"
     feed = feedparser.parse(rss_url)
     results = []
@@ -41,14 +42,15 @@ def nyaa_newest(query: str, quality: int | None = None
     for entry in feed.entries:
         print(f"Title: {entry.title}")
 
-        seeders = entry.get('nyaa_seeders', 'N/A')
-        leechers = entry.get('nyaa_leechers', 'N/A')
-        info_hash = entry.get('nyaa_infohash', 'N/A')
-        size = entry.get('nyaa_size', 'N/A')
+        seeders = cast(str, entry.get('nyaa_seeders', 'N/A'))
+        leechers = cast(str, entry.get('nyaa_leechers', 'N/A'))
+        info_hash = cast(str, entry.get('nyaa_infohash', 'N/A'))
+        size = cast(str, entry.get('nyaa_size', 'N/A'))
+        title = cast(str, entry.title)
 
         results.append(
                 NyaaTorrent(
-                    title=entry.title,
+                    title=title,
                     seeders=seeders,
                     leechers=leechers,
                     size=size,
