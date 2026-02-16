@@ -7,7 +7,7 @@ def get_xdg(var: str, default: str) -> Path:
     if path_str:
         path_str = Path(path_str)
     else:
-        home = os.environ.get('HOME')
+        home = os.environ.get('HOME', '')
         path_str = Path(home) / default
     path = path_str / 'subsplease'
     print('path', path)

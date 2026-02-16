@@ -92,7 +92,7 @@ class Subsplease:
 
     def latest(self, page: int | None = None
                ) -> Result[list[EpisodeData], str]:
-        params = {'f': 'latest'}
+        params: dict = {'f': 'latest'}
         if page is not None:
             params['p'] = page
         response = self.api_get(params)

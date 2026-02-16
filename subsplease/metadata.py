@@ -126,8 +126,6 @@ class MetadataProvider:
                 key = f"s{index}"
                 if key in data_block and data_block[key] is not None:
                     mapped_results[show.id] = show
-                else:
-                    mapped_results[show.id] = None
 
             return Ok(mapped_results)
 
