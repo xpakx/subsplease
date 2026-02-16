@@ -105,6 +105,18 @@ def today(program: Program):
     program.today()
 
 
+# TODO
+@dispatcher.command
+def all_latest(program: Program):
+    program.latest()
+
+
+# TODO
+@dispatcher.command
+def search_show_meta(program: Program, name: str):
+    program.view_show(name)
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()
@@ -118,15 +130,6 @@ def main():
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:
         dispatcher.dispatch(args.cmd_key, program, args)
-
-    # to_view = args.view
-    # if to_view is not None:
-        # program.view_show(to_view)
-        # exit(0)
-
-    # TODO: day latest
-    # if args.latest:
-        # program.latest()
 
 
 if __name__ == "__main__":
