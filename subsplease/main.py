@@ -28,22 +28,25 @@ class CommandDispatcher:
         cmd_def = CommandDefiniton(
                 name=name,
                 func=command,
-                arguments=args[1:]
+                arguments=args
         )
         self.commands[name] = cmd_def
 
     def add_service(self, name: str, service: Any):
         self.services[name] = service
 
-    def dispatch(self, name, service, args):
+    def dispatch(self, name, args):
         cmd = self.commands.get(name)
         if not cmd:
             return
         kwargs = {}
         vs = vars(args)
         for elem in cmd.arguments:
-            kwargs[elem] = vs.get(elem)
-        cmd.func(service, **kwargs)
+            if elem in self.services:
+                kwargs[elem] = self.services.get(elem)
+            else:
+                kwargs[elem] = vs.get(elem)
+        cmd.func(**kwargs)
 
     def command(self, f):
         self.register(f.__name__, f)
@@ -134,7 +137,7 @@ def main():
 
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:
-        dispatcher.dispatch(args.cmd_key, program, args)
+        dispatcher.dispatch(args.cmd_key, args)
 
 
 if __name__ == "__main__":
