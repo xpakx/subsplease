@@ -7,7 +7,7 @@ from subsplease.date import get_day
 from subsplease.config import get_data_location
 from inspect import signature
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Any
 
 
 @dataclass
@@ -20,6 +20,7 @@ class CommandDefiniton:
 class CommandDispatcher:
     def __init__(self):
         self.commands: dict[str, CommandDefiniton] = {}
+        self.services: dict[str, Any] = {}
 
     def register(self, name: str, command: Callable):
         sig = signature(command)
@@ -30,6 +31,9 @@ class CommandDispatcher:
                 arguments=args[1:]
         )
         self.commands[name] = cmd_def
+
+    def add_service(self, name: str, service: Any):
+        self.services[name] = service
 
     def dispatch(self, name, service, args):
         cmd = self.commands.get(name)
@@ -125,6 +129,7 @@ def main():
     subs = Subsplease()
     program = Program(subs, meta, db)
     program.load_shows()
+    dispatcher.add_service('program', program)
     # program.switch_only_tracked(args.tracked)
 
     cmd_key = getattr(args, 'cmd_key', None)
