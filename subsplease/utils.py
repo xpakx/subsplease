@@ -241,13 +241,7 @@ class DayService:
     def today(self):
         res = self.subs.schedule()
         today_shows = res.unwrap().schedule
-        for show in today_shows:
-            local = self.program.current.get(show.page)
-            if not local:
-                self.db.create_entry(show.page, show.title)
-            if local and not local.anilist_id:
-                # TODO: repo???
-                self.program.fetch_show(show.title, local)
+        self.update_local(today_shows)
 
         display_schedule(
                 res.unwrap(),
@@ -255,29 +249,35 @@ class DayService:
                 self.program.only_tracked
         )
 
+    def update_local(self, shows: list[ScheduleEntry]):
+        for show in shows:
+            self.update_or_create_local_show(show)
+
+    def update_or_create_local_show(
+            self, show: ScheduleEntry
+    ) -> LocalShow | None:
+        local = self.program.current.get(show.page)
+        if not local:
+            self.db.create_entry(show.page, show.title)
+        if local and not local.anilist_id:
+            # TODO: repo???
+            self.program.fetch_show(show.title, local)
+        return local
+
     def show_day(self, day: str):
         res = self.subs.weekly_schedule()
         week = res.unwrap().schedule
         day_list = week.get_day(day)
         if not day_list:
             return
-        self.get_day(day_list)
+        self.update_local(day_list)
 
         print(day.capitalize())
         display_schedule(day_list, self.program.current)
-
-    def get_day(self, shows: list[ScheduleEntry]):
-        for show in shows:
-            local = self.program.current.get(show.page)
-            if not local:
-                self.db.create_entry(show.page, show.title)
-            if local and not local.anilist_id:
-                # TODO: repo???
-                self.program.fetch_show(show.title, local)
 
     # TODO: move
     def update_schedule(self):
         res = self.subs.weekly_schedule().unwrap()
         for day_name, day_list in res.schedule:
             print(f"Updating {day_name.title()}")
-            self.get_day(day_list)
+            self.update_local(day_list)
