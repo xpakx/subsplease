@@ -10,6 +10,7 @@ import re
 import unicodedata
 from subsplease.torrent import (
         check_torrent,
+        check_torrent_corrupted,
         move_torrent,
         send_magnet_to_transmission
 )
@@ -101,6 +102,16 @@ class Program:
             if finished:
                 move_torrent(ep.torrent_hash, show.dir_name)
                 ep.downloaded = True
+                self.db.update_episode(ep)
+
+    def fix_torrents(self):
+        eps = self.db.get_unfinished_downloads().unwrap()
+        for ep in eps:
+            corrupted = check_torrent_corrupted(ep.torrent_hash)
+            if corrupted:
+                print("Found corrupted torrent")
+                print(ep.show_id, ep.episode)
+                ep.torrent_hash = None
                 self.db.update_episode(ep)
 
     def select_show(self, query: str):

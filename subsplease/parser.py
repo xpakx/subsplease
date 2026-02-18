@@ -80,4 +80,10 @@ def get_parser() -> argparse.ArgumentParser:
             help='Update schedule'
     )
     parser_schedule_sync.set_defaults(cmd_key='update_season')
+
+    parser_clean = subparsers.add_parser(
+            'clean',
+            help='Clean torrents'
+    )
+    parser_clean.set_defaults(cmd_key='clean')
     return parser

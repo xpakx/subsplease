@@ -132,6 +132,11 @@ def search_show_meta(program: Program, name: str):
     program.view_show(name)
 
 
+@dispatcher.command
+def clean(program: Program):
+    program.fix_torrents()
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()

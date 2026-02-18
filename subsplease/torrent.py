@@ -65,6 +65,23 @@ def check_torrent(torrent_id: int) -> bool:
         return False
 
 
+# TODO: join with normal check
+def check_torrent_corrupted(torrent_id: int) -> bool:
+    try:
+        c = Client(
+                host='localhost',
+                port=9091,
+                username='test',
+                password='test_password'
+        )
+        c.get_torrent(torrent_id)
+        return False
+    except KeyError:
+        return True
+    except Exception:
+        return False
+
+
 def list_torrents():
     try:
         c = Client(
