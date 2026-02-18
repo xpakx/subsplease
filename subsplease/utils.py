@@ -33,17 +33,6 @@ class Program:
     def switch_only_tracked(self, value: bool):
         self.only_tracked = value
 
-    def today(self):
-        res = self.subs.schedule()
-        today_shows = res.unwrap().schedule
-        for show in today_shows:
-            local = self.current.get(show.page)
-            if not local:
-                self.db.create_entry(show.page, show.title)
-            if local and not local.anilist_id:
-                self.fetch_show(show.title, local)
-        display_schedule(res.unwrap(), self.current, self.only_tracked)
-
     def fetch_show(self, title: str, show: LocalShow):
         print("Fetching")
         result = self.meta.search_show(title)
@@ -54,30 +43,6 @@ class Program:
             show.anilist_id = ani_list_show.id
             show.dir_name = self.get_show_dir(show)
             self.db.update_show(show)
-
-    def show_day(self, day: str):
-        res = self.subs.weekly_schedule()
-        week = res.unwrap().schedule
-        day_list = week.get_day(day)
-        if not day_list:
-            return
-        self.get_day(day_list)
-        print(day.capitalize())
-        display_schedule(day_list, self.current)
-
-    def get_day(self, shows: list[ScheduleEntry]):
-        for show in shows:
-            local = self.current.get(show.page)
-            if not local:
-                self.db.create_entry(show.page, show.title)
-            if local and not local.anilist_id:
-                self.fetch_show(show.title, local)
-
-    def update_schedule(self):
-        res = self.subs.weekly_schedule().unwrap()
-        for day_name, day_list in res.schedule:
-            print(f"Updating {day_name.title()}")
-            self.get_day(day_list)
 
     def show_schedule(self):
         res = self.subs.weekly_schedule().unwrap()
@@ -261,3 +226,58 @@ class Program:
         data = self.subs.show(show_id)
         episodes = list(data.unwrap().episode.values())
         display_latest(episodes, self.current)
+
+
+class DayService:
+    def __init__(self, api: Subsplease,
+                 meta: MetadataProvider, db: AnimeDB,
+                 program: Program
+                 ):
+        self.subs = api
+        self.meta = meta
+        self.db = db
+        self.program = program
+
+    def today(self):
+        res = self.subs.schedule()
+        today_shows = res.unwrap().schedule
+        for show in today_shows:
+            local = self.program.current.get(show.page)
+            if not local:
+                self.db.create_entry(show.page, show.title)
+            if local and not local.anilist_id:
+                # TODO: repo???
+                self.program.fetch_show(show.title, local)
+
+        display_schedule(
+                res.unwrap(),
+                self.program.current,
+                self.program.only_tracked
+        )
+
+    def show_day(self, day: str):
+        res = self.subs.weekly_schedule()
+        week = res.unwrap().schedule
+        day_list = week.get_day(day)
+        if not day_list:
+            return
+        self.get_day(day_list)
+
+        print(day.capitalize())
+        display_schedule(day_list, self.program.current)
+
+    def get_day(self, shows: list[ScheduleEntry]):
+        for show in shows:
+            local = self.program.current.get(show.page)
+            if not local:
+                self.db.create_entry(show.page, show.title)
+            if local and not local.anilist_id:
+                # TODO: repo???
+                self.program.fetch_show(show.title, local)
+
+    # TODO: move
+    def update_schedule(self):
+        res = self.subs.weekly_schedule().unwrap()
+        for day_name, day_list in res.schedule:
+            print(f"Updating {day_name.title()}")
+            self.get_day(day_list)

@@ -1,7 +1,7 @@
 from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
-from subsplease.utils import Program
+from subsplease.utils import Program, DayService
 from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location
@@ -86,10 +86,10 @@ def show_view(program: Program, name: str):
 
 
 @dispatcher.command
-def day(program: Program, weekday: str):
-    day = get_day(weekday)
-    if day:
-        program.show_day(day)
+def day(day: DayService, weekday: str):
+    day_data = get_day(weekday)
+    if day_data:
+        day.show_day(day_data)
 
 
 @dispatcher.command
@@ -103,13 +103,13 @@ def show_season(program: Program):
 
 
 @dispatcher.command
-def update_season(program: Program):
-    program.update_schedule()
+def update_season(day: DayService):
+    day.update_schedule()
 
 
 @dispatcher.command
-def today(program: Program):
-    program.today()
+def today(day: DayService):
+    day.today()
 
 
 # TODO
@@ -131,8 +131,10 @@ def main():
     db = AnimeDB(db_path=get_data_location())
     subs = Subsplease()
     program = Program(subs, meta, db)
+    day = DayService(subs, meta, db, program)
     program.load_shows()
     dispatcher.add_service('program', program)
+    dispatcher.add_service('day', day)
     # program.switch_only_tracked(args.tracked)
 
     cmd_key = getattr(args, 'cmd_key', None)
