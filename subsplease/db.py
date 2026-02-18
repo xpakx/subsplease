@@ -31,6 +31,7 @@ class LocalEpisode(msgspec.Struct):
 class AnimeDB:
     def __init__(self, db_path: Path = Path("ani.db")):
         self.db_path = db_path
+        db_path.parent.mkdir(parents=True, exist_ok=True)
         self._run_migrations()
 
     def _run_migrations(self):
