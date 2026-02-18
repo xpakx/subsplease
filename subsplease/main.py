@@ -128,7 +128,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
-    db = AnimeDB(db_path=get_data_location())
+    db = AnimeDB(db_path=get_data_location() / 'ani.db')
     subs = Subsplease()
     program = Program(subs, meta, db)
     day = DayService(subs, meta, db, program)
