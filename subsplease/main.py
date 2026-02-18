@@ -10,6 +10,13 @@ from dataclasses import dataclass
 from typing import Callable, Any
 
 
+# MAYBE: clean up services and extract repos
+# MAYBE: add jikan support
+# MAYBE: tracking shows no on subsplease
+# MAYBE: finished shows
+# MAYBE: finished shows
+
+
 @dataclass
 class CommandDefiniton:
     name: str
@@ -73,7 +80,8 @@ def show_get(program: Program, name: str, episode: int):
     program.select(name)
     if episode:
         program.find_and_get_episode(episode)
-    # TODO: latest/all undownloaded
+    else:
+        program.find_get_new_episodes()
 
 
 @dispatcher.command

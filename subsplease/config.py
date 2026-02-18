@@ -10,7 +10,6 @@ def get_xdg(var: str, default: str) -> Path:
         home = os.environ.get('HOME', '')
         path_str = Path(home) / default
     path = path_str / 'subsplease'
-    print('path', path)
     return path
 
 

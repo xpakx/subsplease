@@ -299,3 +299,24 @@ class AnimeDB:
             return Ok(True)
         except sqlite3.Error as e:
             return Err(f"DB Error: {e}")
+
+    def get_downloaded_for_show(
+            self, show_id: int
+    ) -> Result[list[LocalEpisode], str]:
+        try:
+            with sqlite3.connect(self.db_path) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.execute("""
+                                  SELECT *
+                                  FROM episodes
+                                  WHERE show_id = ?
+                                  AND torrent_hash IS NOT NULL
+                                  """, (show_id,))
+                rows = cur.fetchall()
+
+                shows = [
+                    self.db_to_object(LocalEpisode, r) for r in rows
+                ]
+                return Ok(shows)
+        except sqlite3.Error as e:
+            return Err(f"DB Error: {e}")

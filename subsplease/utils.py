@@ -1,6 +1,6 @@
 from subsplease.api import Subsplease, ScheduleEntry
 from subsplease.metadata import MetadataProvider
-from subsplease.db import AnimeDB, LocalShow
+from subsplease.db import AnimeDB, LocalShow, LocalEpisode
 from subsplease.display import (
         display_schedule,
         display_latest,
@@ -226,6 +226,50 @@ class Program:
         data = self.subs.show(show_id)
         episodes = list(data.unwrap().episode.values())
         display_latest(episodes, self.current)
+
+    def find_get_new_episodes(self):
+        show = self.selection
+        if not show:
+            return
+        show_id = show.subsplease_id
+        if not show_id:
+            show_id = self.subs.get_sid(show.sid).unwrap()
+            show.subsplease_id = show_id
+            self.db.update_show(show)
+        data = self.subs.show(show_id)
+        episodes = list(data.unwrap().episode.values())
+        print([x.episode for x in episodes])
+        downloaded = self.db.get_downloaded_for_show(show.id).unwrap()
+        if len(downloaded) > 0:
+            max_episode = max([x.episode for x in downloaded])
+        else:
+            max_episode = -1
+        print(max_episode)
+        episodes = [x for x in episodes if self.later_than(x, max_episode)]
+        print([x.episode for x in episodes])
+
+        for episode in episodes:
+            hash = send_magnet_to_transmission(episode, "720")
+            if not hash:
+                return
+            print(show.title_english)
+            r = self.db.create_episode(show.id, self.get_num(episode), hash)
+            print(r)
+
+    def get_num(self, episode: LocalEpisode) -> int:
+        num = episode.episode
+        if not num.isdigit():
+            num = num.split('v')[0]
+        return int(num)
+
+    def later_than(self, episode: LocalEpisode, max_ep: int) -> bool:
+        num = episode.episode
+        if not num.isdigit():
+            num = num.split('v')[0]
+        if not num.isdigit():
+            return False
+        num = int(num)
+        return num > max_ep
 
 
 class DayService:
