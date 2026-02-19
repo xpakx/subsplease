@@ -13,8 +13,7 @@ from typing import Callable, Any
 # MAYBE: clean up services and extract repos
 # MAYBE: add jikan support
 # MAYBE: tracking shows no on subsplease
-# MAYBE: finished shows
-# MAYBE: finished shows
+# MAYBE: clean finished shows
 
 
 @dataclass
@@ -120,13 +119,11 @@ def today(day: DayService):
     day.today()
 
 
-# TODO
 @dispatcher.command
 def all_latest(program: Program):
     program.latest()
 
 
-# TODO
 @dispatcher.command
 def search_show_meta(program: Program, name: str):
     program.view_show(name)

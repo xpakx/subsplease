@@ -86,4 +86,21 @@ def get_parser() -> argparse.ArgumentParser:
             help='Clean torrents'
     )
     parser_clean.set_defaults(cmd_key='clean')
+
+    parser_latest = subparsers.add_parser(
+            'latest',
+            help='All latest uploads'
+    )
+    parser_latest.set_defaults(cmd_key='all_latest')
+
+    parser_search = subparsers.add_parser(
+            'search',
+            help='Search meta data'
+    )
+    parser_search.add_argument(
+            'name',
+            type=str,
+            help='Name of the show'
+    )
+    parser_search.set_defaults(cmd_key='search_show_meta')
     return parser
