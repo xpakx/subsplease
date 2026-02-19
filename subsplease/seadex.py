@@ -1,6 +1,33 @@
 from subsplease.result import Result, Err, Ok
 import requests
+import msgspec
 from typing import Any
+
+
+class SeadexEntry(msgspec.Struct):
+    collectionName: str
+    created: str
+    dualAudio: bool
+    groupedUrl: str
+    infoHash: str
+    isBest: bool
+    tracker: str
+    url: str
+    updated: str
+
+
+class SeadexExpand(msgspec.Struct):
+    trs: list[SeadexEntry]
+
+
+class SeadexItem(msgspec.Struct):
+    comparison: str
+    expand: SeadexExpand
+
+
+class SeadexResponse(msgspec.Struct):
+    totalItems: int
+    items: list[SeadexItem]
 
 
 class Seadex:
@@ -31,7 +58,9 @@ class Seadex:
                     'filter': filter,
                 }
         )
-        return response
+        return response.try_map(
+                lambda r: msgspec.json.decode(r, type=SeadexResponse)
+        )
 
 
 if __name__ == "__main__":
