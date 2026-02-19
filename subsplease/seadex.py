@@ -4,6 +4,10 @@ import msgspec
 from typing import Any
 
 
+class SeadexFile(msgspec.Struct):
+    length: int
+
+
 class SeadexEntry(msgspec.Struct):
     collectionName: str
     created: str
@@ -14,6 +18,13 @@ class SeadexEntry(msgspec.Struct):
     tracker: str
     url: str
     updated: str
+    files: list[SeadexFile]
+
+    def length(self) -> int:
+        return sum([x.length for x in self.files])
+
+    def size(self) -> str:
+        return format_bytes(self.length())
 
 
 class SeadexExpand(msgspec.Struct):
@@ -63,8 +74,25 @@ class Seadex:
         )
 
 
+def format_bytes(size_bytes):
+    if size_bytes == 0:
+        return "0 B"
+    units = ("B", "KB", "MB", "GB")
+    i = 0
+    while size_bytes >= 1024 and i < len(units) - 1:
+        size_bytes /= 1024
+        i += 1
+    return f"{size_bytes:.2f} {units[i]}"
+
+
 if __name__ == "__main__":
     dex = Seadex()
-    resp = dex.schedule(179302)
-    print(resp)
-
+    resp = dex.schedule(179302).unwrap()
+    entries = resp.items[0].expand.trs
+    for entry in entries:
+        print(entry.tracker)
+        print(entry.infoHash)
+        print(entry.url)
+        print(entry.created)
+        print(entry.size())
+        print()
