@@ -1,4 +1,4 @@
-from subsplease.api import Subsplease, ScheduleEntry
+from subsplease.api import Subsplease, ScheduleEntry, EpisodeData
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB, LocalShow, LocalEpisode
 from subsplease.display import (
@@ -267,13 +267,13 @@ class Program:
             r = self.db.create_episode(show.id, self.get_num(episode), hash)
             print(r)
 
-    def get_num(self, episode: LocalEpisode) -> int:
+    def get_num(self, episode: EpisodeData) -> int:
         num = episode.episode
         if not num.isdigit():
             num = num.split('v')[0]
         return int(num)
 
-    def later_than(self, episode: LocalEpisode, max_ep: int) -> bool:
+    def later_than(self, episode: EpisodeData, max_ep: int) -> bool:
         num = episode.episode
         if not num.isdigit():
             num = num.split('v')[0]
