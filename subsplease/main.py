@@ -136,6 +136,12 @@ def clean(program: Program):
     program.fix_torrents()
 
 
+@dispatcher.command
+def show_delete(program: Program, name: str):
+    program.select(name)
+    program.delete_show()
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()

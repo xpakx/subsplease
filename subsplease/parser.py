@@ -103,4 +103,10 @@ def get_parser() -> argparse.ArgumentParser:
             help='Name of the show'
     )
     parser_search.set_defaults(cmd_key='search_show_meta')
+
+    parser_delete = show_subparsers.add_parser(
+            'delete',
+            help='Delete show'
+    )
+    parser_delete.set_defaults(cmd_key='show_delete')
     return parser

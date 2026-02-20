@@ -16,6 +16,9 @@ from subsplease.torrent import (
 )
 from rapidfuzz import process, fuzz
 from rapidfuzz.utils import default_process
+from pathlib import Path
+import shutil
+from rich.prompt import Confirm
 
 
 class Program:
@@ -281,6 +284,33 @@ class Program:
             return False
         num = int(num)
         return num > max_ep
+
+    def delete_show(self):
+        show = self.selection
+        if not show:
+            return
+        show_id = show.subsplease_id
+        if not show_id:
+            show_id = self.subs.get_sid(show.sid).unwrap()
+            show.subsplease_id = show_id
+            self.db.update_show(show)
+        show_dir = Path.home() / "Videos" / "TV Series" / show.dir_name
+
+        if not show_dir.exists():
+            print(f"Folder {show_dir} not found.")
+            return
+
+        print(
+                f"Deleting {show_dir}."
+        )
+        proceed = Confirm.ask("Are you sure?")
+        if not proceed:
+            return
+        try:
+            shutil.rmtree(show_dir)
+            print("Folder removed successfully.")
+        except OSError as e:
+            print(f"Error: {e.strerror}")
 
 
 class DayService:
