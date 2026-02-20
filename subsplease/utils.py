@@ -224,7 +224,11 @@ class Program:
             return
         print(show.title_english)
         r = self.db.create_episode(show.id, episode_num, hash)
+
         print(r)
+        if episode_num > show.last_episode:
+            show.last_episode = episode_num
+            self.db.update_show(show)
 
     def show_episodes(self):
         show = self.selection
@@ -262,13 +266,21 @@ class Program:
         episodes = [x for x in episodes if self.later_than(x, max_episode)]
         print([x.episode for x in episodes])
 
+        show_updated = False
         for episode in episodes:
             hash = send_magnet_to_transmission(episode, "720")
             if not hash:
                 return
             print(show.title_english)
-            r = self.db.create_episode(show.id, self.get_num(episode), hash)
+            episode_num = self.get_num(episode)
+            r = self.db.create_episode(show.id, episode_num, hash)
+            if episode_num > show.last_episode:
+                show.last_episode = episode_num
+                show_updated = True
             print(r)
+
+        if show_updated:
+            self.db.update_show(show)
 
     def get_num(self, episode: EpisodeData) -> int:
         num = episode.episode

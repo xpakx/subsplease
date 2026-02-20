@@ -12,7 +12,7 @@ from typing import Callable, Any
 
 # MAYBE: clean up services and extract repos
 # MAYBE: add jikan support
-# MAYBE: tracking shows no on subsplease
+# MAYBE: tracking shows that are not on subsplease
 # MAYBE: clean finished shows
 # MAYBE: images from sakugabooru/seadex
 #        to check if series is worth watching
