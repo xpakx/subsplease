@@ -1,11 +1,13 @@
 from subsplease.api import Subsplease, ScheduleEntry, EpisodeData
 from subsplease.metadata import MetadataProvider
-from subsplease.db import AnimeDB, LocalShow, LocalEpisode
+from subsplease.db import AnimeDB, LocalShow
 from subsplease.display import (
         display_schedule,
         display_latest,
         display_details
 )
+from subsplease.seadex import Seadex
+from subsplease.nyaa import nyaa_newest
 import re
 import unicodedata
 from subsplease.torrent import (
@@ -378,3 +380,16 @@ class DayService:
         for day_name, day_list in res.schedule:
             print(f"Updating {day_name.title()}")
             self.update_local(day_list)
+
+
+class TorrentSearchService:
+    def __init__(self, seadex: Seadex):
+        self.seadex = seadex
+
+    def search(self, name: str):
+        # seadex uses anilist id
+        result = nyaa_newest(name, 720).unwrap()
+        for entry in result:
+            print(entry.title)
+            print(entry.size)
+            print()

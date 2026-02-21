@@ -33,15 +33,12 @@ def nyaa_newest(query: str, quality: int | None = None
                 ) -> Result[list[NyaaTorrent], str]:
     if quality:
         query += f" {quality}p"
-    print(query)
     query = parse.quote_plus(query)
     rss_url = f"https://nyaa.si/?page=rss&q={query}&c=1_2&f=0"
     feed = feedparser.parse(rss_url)
     results = []
 
     for entry in feed.entries:
-        print(f"Title: {entry.title}")
-
         seeders = cast(str, entry.get('nyaa_seeders', 'N/A'))
         leechers = cast(str, entry.get('nyaa_leechers', 'N/A'))
         info_hash = cast(str, entry.get('nyaa_infohash', 'N/A'))
@@ -57,5 +54,4 @@ def nyaa_newest(query: str, quality: int | None = None
                     magnet=create_magnet(info_hash, entry.title)
                 )
         )
-    print(results)
     return Ok(results)

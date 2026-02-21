@@ -1,13 +1,14 @@
 from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
-from subsplease.utils import Program, DayService
+from subsplease.utils import Program, DayService, TorrentSearchService
 from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location
 from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
+from subsplease.seadex import Seadex
 
 
 # MAYBE: clean up services and extract repos
@@ -132,6 +133,11 @@ def search_show_meta(program: Program, name: str):
 
 
 @dispatcher.command
+def search_show_torrents(torrent: TorrentSearchService, name: str):
+    torrent.search(name)
+
+
+@dispatcher.command
 def clean(program: Program):
     program.fix_torrents()
 
@@ -154,6 +160,9 @@ def main():
     dispatcher.add_service('program', program)
     dispatcher.add_service('day', day)
     # program.switch_only_tracked(args.tracked)
+    sea = Seadex()
+    torrent = TorrentSearchService(sea)
+    dispatcher.add_service('torrent', torrent)
 
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:

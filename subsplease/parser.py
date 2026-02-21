@@ -104,6 +104,15 @@ def get_parser() -> argparse.ArgumentParser:
     )
     parser_search.set_defaults(cmd_key='search_show_meta')
 
+    search_subparsers = parser_search.add_subparsers(
+            dest='command_search',
+            help='Available commands')
+    parser_search_torrents = search_subparsers.add_parser(
+            'nyaa',
+            help='Search torrents'
+    )
+    parser_search_torrents.set_defaults(cmd_key='search_show_torrents')
+
     parser_delete = show_subparsers.add_parser(
             'delete',
             help='Delete show'
