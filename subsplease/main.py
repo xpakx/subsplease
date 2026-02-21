@@ -1,7 +1,8 @@
 from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
-from subsplease.utils import Program, DayService, TorrentSearchService
+from subsplease.utils import Program, TorrentSearchService
+from subsplease.day import DayService
 from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location
