@@ -35,6 +35,7 @@ class CommandDispatcher:
     def __init__(self):
         self.commands: dict[str, CommandDefiniton] = {}
         self.services: dict[str, Any] = {}
+        self.preprocessors: dict[str, Callable] = {}
 
     def register(self, name: str, command: Callable):
         sig = signature(command)
@@ -49,6 +50,9 @@ class CommandDispatcher:
     def add_service(self, name: str, service: Any):
         self.services[name] = service
 
+    def add_preprocessor(self, name: str, processor: Callable):
+        self.preprocessors[name] = processor
+
     def dispatch(self, name, args):
         cmd = self.commands.get(name)
         if not cmd:
@@ -59,7 +63,10 @@ class CommandDispatcher:
             if elem in self.services:
                 kwargs[elem] = self.services.get(elem)
             else:
-                kwargs[elem] = vs.get(elem)
+                value = vs.get(elem)
+                if elem in self.preprocessors:
+                    value = self.preprocessors[elem](value)
+                kwargs[elem] = value
         cmd.func(**kwargs)
 
     def command(self, f):
@@ -101,10 +108,9 @@ def show_view(program: Program, name: str):
 
 
 @dispatcher.command
-def day(day: DayService, weekday: str):
-    day_data = get_day(weekday)
-    if day_data:
-        day.show_day(day_data)
+def day(day: DayService, weekday: str | None):
+    if weekday:
+        day.show_day(weekday)
 
 
 @dispatcher.command
@@ -166,6 +172,7 @@ def main():
     dispatcher.add_service('program', program)
     dispatcher.add_service('schedule', schedule)
     dispatcher.add_service('day', day)
+    dispatcher.add_preprocessor('weekday', get_day)
     # program.switch_only_tracked(args.tracked)
     sea = Seadex()
     torrent = TorrentSearchService(sea)
