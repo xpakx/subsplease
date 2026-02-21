@@ -1,7 +1,11 @@
 from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
-from subsplease.utils import Program, TorrentSearchService
+from subsplease.utils import (
+        Program,
+        TorrentSearchService,
+        ScheduleService
+)
 from subsplease.day import DayService
 from subsplease.parser import get_parser
 from subsplease.date import get_day
@@ -109,8 +113,8 @@ def sync(program: Program):
 
 
 @dispatcher.command
-def show_season(program: Program):
-    program.show_schedule()
+def show_season(schedule: ScheduleService):
+    schedule.show_schedule()
 
 
 @dispatcher.command
@@ -124,8 +128,8 @@ def today(day: DayService):
 
 
 @dispatcher.command
-def all_latest(program: Program):
-    program.latest()
+def all_latest(schedule: ScheduleService):
+    schedule.latest()
 
 
 @dispatcher.command
@@ -157,8 +161,10 @@ def main():
     subs = Subsplease()
     program = Program(subs, meta, db)
     day = DayService(subs, meta, db, program)
+    schedule = ScheduleService(subs, meta, db, program)
     program.load_shows()
     dispatcher.add_service('program', program)
+    dispatcher.add_service('schedule', schedule)
     dispatcher.add_service('day', day)
     # program.switch_only_tracked(args.tracked)
     sea = Seadex()

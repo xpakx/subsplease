@@ -50,16 +50,6 @@ class Program:
             show.dir_name = self.get_show_dir(show)
             self.db.update_show(show)
 
-    def show_schedule(self):
-        res = self.subs.weekly_schedule().unwrap()
-        for day_name, day_list in res.schedule:
-            print(day_name)
-            display_schedule(day_list, self.current)
-
-    def latest(self):
-        episodes = self.subs.latest()
-        display_latest(episodes.unwrap(), self.current, self.only_tracked)
-
     def view_show(self, title: str):
         print(f"Searching '{title}'")
         result = self.meta.search_show_details(title).unwrap()
@@ -338,3 +328,32 @@ class TorrentSearchService:
             print(entry.title)
             print(entry.size)
             print()
+
+
+class ScheduleService:
+    def __init__(self, api: Subsplease,
+                 meta: MetadataProvider, db: AnimeDB,
+                 program: Program):
+        self.subs = api
+        self.meta = meta
+        self.db = db
+        self.program = program
+
+    def latest(self):
+        episodes = self.subs.latest()
+        if episodes.is_err():
+            return
+        display_latest(
+                episodes.ok(),
+                self.program.current,
+                self.program.only_tracked
+        )
+
+    def show_schedule(self):
+        res = self.subs.weekly_schedule()
+        if res.is_err():
+            return
+        weekly_schedule = res.ok()
+        for day_name, day_list in weekly_schedule.schedule:
+            print(day_name)
+            display_schedule(day_list, self.program.current)
