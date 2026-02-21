@@ -298,6 +298,8 @@ class Program:
             show_id = self.subs.get_sid(show.sid).unwrap()
             show.subsplease_id = show_id
             self.db.update_show(show)
+        if not show.dir_name:
+            return
         show_dir = Path.home() / "Videos" / "TV Series" / show.dir_name
 
         if not show_dir.exists():
@@ -344,7 +346,7 @@ class ScheduleService:
         if episodes.is_err():
             return
         display_latest(
-                episodes.ok(),
+                episodes.unwrap(),
                 self.program.current,
                 self.program.only_tracked
         )
@@ -353,7 +355,7 @@ class ScheduleService:
         res = self.subs.weekly_schedule()
         if res.is_err():
             return
-        weekly_schedule = res.ok()
+        weekly_schedule = res.unwrap()
         for day_name, day_list in weekly_schedule.schedule:
             print(day_name)
             display_schedule(day_list, self.program.current)
