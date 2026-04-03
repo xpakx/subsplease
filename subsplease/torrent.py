@@ -5,6 +5,15 @@ from pathlib import Path
 import shutil
 
 
+def _get_client() -> Client:
+    return Client(
+            host="localhost",
+            port=9091,
+            username="test",
+            password="test_password"
+        )
+
+
 def magnet(episode: EpisodeData, quality: str):
     link = select_quality(episode, quality)
     if not link:
@@ -20,19 +29,13 @@ def select_quality(episode: EpisodeData, quality: str) -> DownloadData | None:
     return None
 
 
-def send_magnet_to_transmission(episode: EpisodeData, quality: str
-                                ) -> str | None:
+def send_magnet_to_transmission(episode: EpisodeData, quality: str) -> str | None:
     link = select_quality(episode, quality)
     if not link:
         return
 
     try:
-        c = Client(
-                host='localhost',
-                port=9091,
-                username='test',
-                password='test_password'
-        )
+        c = _get_client()
         new_torrent = c.add_torrent(link.magnet)
         print(f"Success! Added torrent: {new_torrent.name}")
         print(f"ID: {new_torrent.id}")
@@ -45,12 +48,7 @@ def send_magnet_to_transmission(episode: EpisodeData, quality: str
 
 def check_torrent(torrent_id: int) -> bool:
     try:
-        c = Client(
-                host='localhost',
-                port=9091,
-                username='test',
-                password='test_password'
-        )
+        c = _get_client()
         torrent = c.get_torrent(torrent_id)
         print(f"Found torrent: {torrent.name}")
         is_done = torrent.percent_done == 1.0
@@ -68,12 +66,7 @@ def check_torrent(torrent_id: int) -> bool:
 # TODO: join with normal check
 def check_torrent_corrupted(torrent_id: int) -> bool:
     try:
-        c = Client(
-                host='localhost',
-                port=9091,
-                username='test',
-                password='test_password'
-        )
+        c = _get_client()
         c.get_torrent(torrent_id)
         return False
     except KeyError:
@@ -84,12 +77,7 @@ def check_torrent_corrupted(torrent_id: int) -> bool:
 
 def list_torrents():
     try:
-        c = Client(
-                host='localhost',
-                port=9091,
-                username='test',
-                password='test_password'
-        )
+        c = _get_client()
         torrents = c.get_torrents()
         for torrent in torrents:
             print(f"[{torrent.id}] {torrent.name}")
@@ -102,12 +90,7 @@ def list_torrents():
 
 def move_torrent(torrent_id: int, dist: str, remove: bool = False):
     try:
-        c = Client(
-                host='localhost',
-                port=9091,
-                username='test',
-                password='test_password'
-        )
+        c = _get_client()
         torrent = c.get_torrent(torrent_id)
         is_done = torrent.percent_done == 1.0
         if not is_done:
