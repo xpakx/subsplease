@@ -1,121 +1,127 @@
 import argparse
 
 
-def get_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="")
-    # parser.add_argument(
-    # "-t", "--tracked", action="store_true",
-    # help="Show only tracked")
-    parser.set_defaults(cmd_key='today')
+def build_parser(spec: dict, parser=None) -> argparse.ArgumentParser:
+    if parser is None:
+        parser = argparse.ArgumentParser(description=spec.get("description", ""))
 
-    subparsers = parser.add_subparsers(
-            dest='command',
-            help='Available commands')
-    parser_show = subparsers.add_parser(
-            'show',
-            aliases=['s'],
-            help='Operate on show'
-    )
-    parser_show.add_argument(
-            'name',
-            type=str,
-            help='Name of the show'
-    )
-    parser_show.set_defaults(cmd_key='show_view')
-    show_subparsers = parser_show.add_subparsers(
-            dest='show_action'
-    )
-    parser_sub = show_subparsers.add_parser(
-            'subscribe',
-            aliases=['sub'],
-            help='Subscribe'
-    )
-    parser_sub.set_defaults(cmd_key='subscribe')
-    parser_sub.add_argument(
-            "-u", "--unsubscribe", action="store_true",
-            help="Unsubscribe show"
-    )
-    eps_for_show_sub = show_subparsers.add_parser(
-            'latest',
-            help='Latest episodes for the show'
-    )
-    eps_for_show_sub.set_defaults(cmd_key='show_latest')
-    ep_get_sub = show_subparsers.add_parser(
-            'get',
-            help='get episode'
-    )
-    ep_get_sub.set_defaults(cmd_key='show_get')
-    ep_get_sub.add_argument(
-            "-e", "--episode", type=int,
-            help="episode number"
-    )
+    for arg in spec.get("args", []):
+        flags = arg.pop("flags")
+        parser.add_argument(*flags, **arg)
 
-    day_show = subparsers.add_parser(
-            'day',
-            help='Operate on day'
-    )
-    day_show.set_defaults(cmd_key='day')
-    day_show.add_argument(
-            'weekday',
-            type=str,
-            help='Weekday'
-    )
+    if "defaults" in spec:
+        parser.set_defaults(**spec["defaults"])
 
-    parser_sync = subparsers.add_parser(
-            'sync',
-            help='Sync files'
-    )
-    parser_sync.set_defaults(cmd_key='sync')
+    if "subparsers" in spec:
+        sp_spec = spec["subparsers"]
+        subparsers = parser.add_subparsers(
+            dest=sp_spec["dest"], help=sp_spec.get("help")
+        )
+        for name, cmd_spec in sp_spec.get("commands", {}).items():
+            parser_args = {
+                k: v
+                for k, v in cmd_spec.items()
+                if k not in ["args", "subparsers", "defaults"]
+            }
+            sub = subparsers.add_parser(name, **parser_args)
+            build_parser(cmd_spec, parser=sub)
 
-    parser_season = subparsers.add_parser(
-            'season',
-            help='Weekly schedule'
-    )
-    parser_season.set_defaults(cmd_key='show_season')
-    season_subparsers = parser_season.add_subparsers(
-            dest='season_action'
-    )
-    parser_schedule_sync = season_subparsers.add_parser(
-            'update',
-            help='Update schedule'
-    )
-    parser_schedule_sync.set_defaults(cmd_key='update_season')
-
-    parser_clean = subparsers.add_parser(
-            'clean',
-            help='Clean torrents'
-    )
-    parser_clean.set_defaults(cmd_key='clean')
-
-    parser_latest = subparsers.add_parser(
-            'latest',
-            help='All latest uploads'
-    )
-    parser_latest.set_defaults(cmd_key='all_latest')
-
-    parser_search = subparsers.add_parser(
-            'search',
-            help='Search meta data'
-    )
-    parser_search.add_argument(
-            'name',
-            type=str,
-            help='Name of the show'
-    )
-    parser_search.set_defaults(cmd_key='search_show_meta')
-
-    search_subparsers = parser_search.add_subparsers(
-            dest='command_search',
-            help='Available commands')
-    parser_search_torrents = search_subparsers.add_parser(
-            'nyaa',
-            help='Search torrents'
-    )
-    parser_search_torrents.set_defaults(cmd_key='search_show_torrents')
-
-    parser_delete = show_subparsers.add_parser(
-            'delete',
-            help='Delete show'
-    )
-    parser_delete.set_defaults(cmd_key='show_delete')
     return parser
+
+
+def get_parser() -> argparse.ArgumentParser:
+    spec = {
+        "defaults": {"cmd_key": "today"},
+        "subparsers": {
+            "dest": "command",
+            "help": "Available commands",
+            "commands": {
+                "show": {
+                    "aliases": ["s"],
+                    "help": "Operate on show",
+                    "args": [
+                        {"flags": ["name"], "type": str, "help": "Name of the show"}
+                    ],
+                    "defaults": {"cmd_key": "show_view"},
+                    "subparsers": {
+                        "dest": "show_action",
+                        "commands": {
+                            "subscribe": {
+                                "aliases": ["sub"],
+                                "help": "Subscribe",
+                                "defaults": {"cmd_key": "subscribe"},
+                                "args": [
+                                    {
+                                        "flags": ["-u", "--unsubscribe"],
+                                        "action": "store_true",
+                                        "help": "Unsubscribe show",
+                                    }
+                                ],
+                            },
+                            "latest": {
+                                "help": "Latest episodes for the show",
+                                "defaults": {"cmd_key": "show_latest"},
+                            },
+                            "get": {
+                                "help": "get episode",
+                                "defaults": {"cmd_key": "show_get"},
+                                "args": [
+                                    {
+                                        "flags": ["-e", "--episode"],
+                                        "type": int,
+                                        "help": "episode number",
+                                    }
+                                ],
+                            },
+                            "delete": {
+                                "help": "Delete show",
+                                "defaults": {"cmd_key": "show_delete"},
+                            },
+                        },
+                    },
+                },
+                "day": {
+                    "help": "Operate on day",
+                    "defaults": {"cmd_key": "day"},
+                    "args": [{"flags": ["weekday"], "type": str, "help": "Weekday"}],
+                },
+                "sync": {"help": "Sync files", "defaults": {"cmd_key": "sync"}},
+                "season": {
+                    "help": "Weekly schedule",
+                    "defaults": {"cmd_key": "show_season"},
+                    "subparsers": {
+                        "dest": "season_action",
+                        "commands": {
+                            "update": {
+                                "help": "Update schedule",
+                                "defaults": {"cmd_key": "update_season"},
+                            }
+                        },
+                    },
+                },
+                "clean": {"help": "Clean torrents", "defaults": {"cmd_key": "clean"}},
+                "latest": {
+                    "help": "All latest uploads",
+                    "defaults": {"cmd_key": "all_latest"},
+                },
+                "search": {
+                    "help": "Search meta data",
+                    "args": [
+                        {"flags": ["name"], "type": str, "help": "Name of the show"}
+                    ],
+                    "defaults": {"cmd_key": "search_show_meta"},
+                    "subparsers": {
+                        "dest": "command_search",
+                        "help": "Available commands",
+                        "commands": {
+                            "nyaa": {
+                                "help": "Search torrents",
+                                "defaults": {"cmd_key": "search_show_torrents"},
+                            }
+                        },
+                    },
+                },
+            },
+        },
+    }
+    return build_parser(spec)
