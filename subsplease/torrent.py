@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 
 
+# TODO: get credentials from config
 def _get_client() -> Client:
     return Client(
             host="localhost",
@@ -12,6 +13,19 @@ def _get_client() -> Client:
             username="test",
             password="test_password"
         )
+
+
+def get_torrents():
+    return _get_client().get_torrents()
+
+
+def get_torrent_details(torrent_id: int):
+    return _get_client().get_torrent(torrent_id)
+
+
+def remove_torrent(torrent_id: int, delete_data: bool = False):
+    return _get_client().remove_torrent(
+            torrent_id, delete_data=delete_data)
 
 
 def magnet(episode: EpisodeData, quality: str):
