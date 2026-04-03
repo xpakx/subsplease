@@ -28,6 +28,8 @@ class DayService:
 
     def update_local(self, shows: list[ScheduleEntry]):
         for show in shows:
+            if not show.page:
+                continue
             self.update_or_create_local_show(show)
 
     def update_or_create_local_show(
