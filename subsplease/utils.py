@@ -156,6 +156,9 @@ class Program:
     def select(self, query: str):
         self.selection = self.select_show(query)
 
+    def select_raw(self, show: LocalShow):
+        self.selection = show
+
     def is_show_selected(self):
         return self.selection is not None
 

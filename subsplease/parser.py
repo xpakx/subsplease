@@ -121,7 +121,19 @@ def get_parser() -> argparse.ArgumentParser:
                         },
                     },
                 },
-                "subs": {"help": "Subscribed shows", "defaults": {"cmd_key": "show_subs"}},
+                "subs": {
+                    "help": "Subscribed shows",
+                    "defaults": {"cmd_key": "show_subs"},
+                    "subparsers": {
+                        "dest": "subs_action",
+                        "commands": {
+                            "get": {
+                                "help": "Get all subscribed",
+                                "defaults": {"cmd_key": "get_all_subs"},
+                            }
+                        },
+                    },
+                },
             },
         },
 

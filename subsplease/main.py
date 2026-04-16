@@ -165,6 +165,14 @@ def show_subs(program: Program):
     print(shows)
 
 
+@dispatcher.command
+def get_all_subs(program: Program):
+    shows = [x for x in program.current.values() if x.tracking]
+    for show in shows:
+        program.select_raw(show)
+        program.find_get_new_episodes()
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()
