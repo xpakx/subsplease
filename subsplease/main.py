@@ -159,6 +159,12 @@ def show_delete(program: Program, name: str):
     program.delete_show()
 
 
+@dispatcher.command
+def show_subs(program: Program):
+    shows = [x for x in program.current.values() if x.tracking]
+    print(shows)
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()

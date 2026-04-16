@@ -121,7 +121,9 @@ def get_parser() -> argparse.ArgumentParser:
                         },
                     },
                 },
+                "subs": {"help": "Subscribed shows", "defaults": {"cmd_key": "show_subs"}},
             },
         },
+
     }
     return build_parser(spec)
