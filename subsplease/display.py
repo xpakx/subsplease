@@ -6,7 +6,6 @@ from rich.table import Table
 from rich import box
 from rich.text import Text
 from rich.panel import Panel
-from rich.markdown import Markdown
 from datetime import datetime
 
 
@@ -129,3 +128,26 @@ def display_details(show: AniListMediaDetails):
         console.print(airing_info)
 
     console.print("\n")
+
+
+def display_subs(data: list[LocalShow]):
+    console = Console()
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold color(255)",
+        border_style="blue",
+    )
+
+    table.add_column("Title", style="white")
+    table.add_column("Last episode", justify="center", width=12)
+
+    for num, entry in enumerate(data):
+        title = entry.title_english
+
+        title = f"[dim]{entry.title_english}[/dim]"
+        episode = f"[dim]{entry.last_episode}[/dim]"
+
+        table.add_row(title, episode)
+
+    console.print(table)

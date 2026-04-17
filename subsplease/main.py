@@ -14,6 +14,7 @@ from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
 from subsplease.seadex import Seadex
+from subsplease.display import display_subs
 
 
 # MAYBE: clean up services and extract repos
@@ -162,7 +163,7 @@ def show_delete(program: Program, name: str):
 @dispatcher.command
 def show_subs(program: Program):
     shows = [x for x in program.current.values() if x.tracking]
-    print(shows)
+    display_subs(shows)
 
 
 @dispatcher.command
