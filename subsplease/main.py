@@ -14,7 +14,7 @@ from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
 from subsplease.seadex import Seadex
-from subsplease.display import display_subs
+from subsplease.subscription import SubscriptionService
 
 
 # MAYBE: clean up services and extract repos
@@ -161,14 +161,13 @@ def show_delete(program: Program, name: str):
 
 
 @dispatcher.command
-def show_subs(program: Program):
-    shows = [x for x in program.current.values() if x.tracking]
-    display_subs(shows)
+def show_subs(subscriptions: SubscriptionService):
+    subscriptions.show_subs()
 
 
 @dispatcher.command
-def get_all_subs(program: Program):
-    shows = [x for x in program.current.values() if x.tracking]
+def get_all_subs(subscriptions: SubscriptionService, program: Program):
+    shows = subscriptions.get_subs()
     for show in shows:
         program.select_raw(show)
         program.find_get_new_episodes()
@@ -192,6 +191,8 @@ def main():
     sea = Seadex()
     torrent = TorrentSearchService(sea)
     dispatcher.add_service('torrent', torrent)
+    subs = SubscriptionService(program)
+    dispatcher.add_service('subscriptions', subs)
 
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:
