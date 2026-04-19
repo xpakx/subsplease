@@ -45,7 +45,7 @@ class MetadataProvider:
             res = self.search_show(title)
             if res.is_ok():
                 media = res.unwrap()
-                results[media.mal_id] = media
+                results[media.id] = media
         return Ok(results)
 
     def search_show_details(
@@ -54,7 +54,7 @@ class MetadataProvider:
         if res.is_err():
             return Err(res.err())  # type: ignore
 
-        mal_id = res.unwrap().mal_id
+        mal_id = res.unwrap().id
         return self.search_show_details_by_id(mal_id)
 
     def search_show_details_by_id(
