@@ -126,8 +126,6 @@ class MetadataProvider:
 
         try:
             print(response.content)
-            # TODO: typing
-
             data = msgspec.json.decode(
                     response.content,
                     type=AniTitles

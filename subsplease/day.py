@@ -39,7 +39,6 @@ class DayService:
         if not local:
             self.db.create_entry(show.page, show.title)
         if local and not local.anilist_id:
-            # TODO: repo???
             self.program.fetch_show(show.title, local)
         return local
 
