@@ -1,4 +1,4 @@
-.PHONY: run mypy
+.PHONY: run mypy types test build install uninstall
 
 all: run
 
@@ -16,3 +16,6 @@ install: build
 
 uninstall:
 	uv tool uninstall subsplease
+
+test:
+	uv run pytest
