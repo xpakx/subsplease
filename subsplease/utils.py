@@ -9,6 +9,7 @@ from subsplease.display import (
 from subsplease.seadex import Seadex
 from subsplease.nyaa import nyaa_newest
 from subsplease.torrent import TorrentAPI
+from subsplease.config import Config
 import re
 import unicodedata
 from rapidfuzz import process, fuzz
@@ -19,7 +20,7 @@ from rich.prompt import Confirm
 
 
 class Program:
-    def __init__(self, api: Subsplease,
+    def __init__(self, config: Config, api: Subsplease,
                  meta: MetadataProvider, db: AnimeDB,
                  torrent: TorrentAPI):
         self.subs = api
@@ -28,6 +29,7 @@ class Program:
         self.only_tracked = False
         self.current: dict[str, LocalShow] = {}
         self.torrent = torrent
+        self.default_quality = config.preferred_quality
 
     def load_shows(self):
         airing = self.db.get_airing_shows().unwrap()
@@ -211,7 +213,8 @@ class Program:
             print("already downloaded")
             return
 
-        hash = self.torrent.send_magnet_to_transmission(episode_to_get, "720")
+        quality = str(self.default_quality)
+        hash = self.torrent.send_magnet_to_transmission(episode_to_get, quality)
         if not hash:
             return
         print(show.title_english)
@@ -259,8 +262,9 @@ class Program:
         print([x.episode for x in episodes])
 
         show_updated = False
+        quality = str(self.default_quality)
         for episode in episodes:
-            hash = self.torrent.send_magnet_to_transmission(episode, "720")
+            hash = self.torrent.send_magnet_to_transmission(episode, quality)
             if not hash:
                 return
             print(show.title_english)
@@ -320,12 +324,13 @@ class Program:
 
 
 class TorrentSearchService:
-    def __init__(self, seadex: Seadex):
+    def __init__(self, config: Config, seadex: Seadex):
         self.seadex = seadex
+        self.default_quality = config.preferred_quality
 
     def search(self, name: str):
         # seadex uses anilist id
-        result = nyaa_newest(name, 720).unwrap()
+        result = nyaa_newest(name, self.default_quality).unwrap()
         for entry in result:
             print(entry.title)
             print(entry.size)

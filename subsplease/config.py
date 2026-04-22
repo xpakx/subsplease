@@ -32,6 +32,7 @@ class Config(msgspec.Struct, rename="camel"):
     torrent_username: str = msgspec.field(name="torrent_provider_username", default="test")
     torrent_password: str = msgspec.field(name="torrent_provider_password", default="test_password")
     library_path: Path = Path.home() / 'Videos' / 'TV Series'
+    preferred_quality: int = 720
 
 
 def load_config():
