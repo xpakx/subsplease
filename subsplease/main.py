@@ -1,6 +1,7 @@
 from subsplease.api import Subsplease
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB
+from subsplease.torrent import TorrentAPI
 from subsplease.utils import (
         Program,
         TorrentSearchService,
@@ -179,7 +180,8 @@ def main():
     meta = MetadataProvider()
     db = AnimeDB(db_path=get_data_location() / 'ani.db')
     subs = Subsplease()
-    program = Program(subs, meta, db)
+    torrent = TorrentAPI()
+    program = Program(subs, meta, db, torrent)
     day = DayService(subs, meta, db, program)
     schedule = ScheduleService(subs, meta, db, program)
     program.load_shows()

@@ -8,14 +8,9 @@ from subsplease.display import (
 )
 from subsplease.seadex import Seadex
 from subsplease.nyaa import nyaa_newest
+from subsplease.torrent import TorrentAPI
 import re
 import unicodedata
-from subsplease.torrent import (
-        check_torrent,
-        check_torrent_corrupted,
-        move_torrent,
-        send_magnet_to_transmission
-)
 from rapidfuzz import process, fuzz
 from rapidfuzz.utils import default_process
 from pathlib import Path
@@ -25,12 +20,14 @@ from rich.prompt import Confirm
 
 class Program:
     def __init__(self, api: Subsplease,
-                 meta: MetadataProvider, db: AnimeDB):
+                 meta: MetadataProvider, db: AnimeDB,
+                 torrent: TorrentAPI):
         self.subs = api
         self.meta = meta
         self.db = db
         self.only_tracked = False
         self.current: dict[str, LocalShow] = {}
+        self.torrent = torrent
 
     def load_shows(self):
         airing = self.db.get_airing_shows().unwrap()
@@ -93,16 +90,16 @@ class Program:
             if not show.dir_name:
                 continue
             print(ep.episode, show.title_english)
-            finished = check_torrent(ep.torrent_hash)
+            finished = self.torrent.check_torrent(ep.torrent_hash)
             if finished:
-                move_torrent(ep.torrent_hash, show.dir_name)
+                self.torrent.move_torrent(ep.torrent_hash, show.dir_name)
                 ep.downloaded = True
                 self.db.update_episode(ep)
 
     def fix_torrents(self):
         eps = self.db.get_unfinished_downloads().unwrap()
         for ep in eps:
-            corrupted = check_torrent_corrupted(ep.torrent_hash)
+            corrupted = self.torrent.check_torrent_corrupted(ep.torrent_hash)
             if corrupted:
                 print("Found corrupted torrent")
                 print(ep.show_id, ep.episode)
@@ -143,7 +140,7 @@ class Program:
         print(len(data.unwrap()))
         data = [show for show in data.unwrap() if show.time == 'New']
         show = data[id]
-        hash = send_magnet_to_transmission(show, quality)
+        hash = self.torrent.send_magnet_to_transmission(show, quality)
         if not hash:
             return
         local = self.current.get(show.page)
@@ -214,7 +211,7 @@ class Program:
             print("already downloaded")
             return
 
-        hash = send_magnet_to_transmission(episode_to_get, "720")
+        hash = self.torrent.send_magnet_to_transmission(episode_to_get, "720")
         if not hash:
             return
         print(show.title_english)
@@ -263,7 +260,7 @@ class Program:
 
         show_updated = False
         for episode in episodes:
-            hash = send_magnet_to_transmission(episode, "720")
+            hash = self.torrent.send_magnet_to_transmission(episode, "720")
             if not hash:
                 return
             print(show.title_english)
