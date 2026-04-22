@@ -12,6 +12,7 @@ class TorrentAPI:
         self.port = config.torrent_port
         self.username = config.torrent_username
         self.password = config.torrent_password
+        self.library_dir = config.library_path
 
     # TODO: get credentials from config
     def _get_client(self) -> Client:
@@ -110,7 +111,7 @@ class TorrentAPI:
 
             path = Path(torrent.download_dir) / torrent.name
             print(path)
-            dest_dir = Path.home() / "Videos" / "TV Series" / dist
+            dest_dir = self.library_dir / dist
             dest_dir.mkdir(parents=True, exist_ok=True)
             print(f"Moving data to {dest_dir} and updating Transmission path...")
             if not remove:
