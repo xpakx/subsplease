@@ -1,21 +1,25 @@
 import subprocess
 from subsplease.api import EpisodeData, DownloadData
+from subsplease.config import Config
 from transmission_rpc import Client
 from pathlib import Path
 import shutil
 
 
 class TorrentAPI:
-    def __init__(self):
-        pass
+    def __init__(self, config: Config):
+        self.host = config.torrent_host
+        self.port = config.torrent_port
+        self.username = config.torrent_username
+        self.password = config.torrent_password
 
     # TODO: get credentials from config
     def _get_client(self) -> Client:
         return Client(
-                host="localhost",
-                port=9091,
-                username="test",
-                password="test_password"
+                host=self.host,
+                port=self.port,
+                username=self.username,
+                password=self.password,
             )
 
     def get_torrents(self):

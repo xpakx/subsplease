@@ -10,7 +10,7 @@ from subsplease.utils import (
 from subsplease.day import DayService
 from subsplease.parser import get_parser
 from subsplease.date import get_day
-from subsplease.config import get_data_location
+from subsplease.config import get_data_location, load_config
 from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
@@ -175,12 +175,13 @@ def get_all_subs(subscriptions: SubscriptionService, program: Program):
 
 
 def main():
+    config = load_config()
     parser = get_parser()
     args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB(db_path=get_data_location() / 'ani.db')
     subs = Subsplease()
-    torrent = TorrentAPI()
+    torrent = TorrentAPI(config)
     program = Program(subs, meta, db, torrent)
     day = DayService(subs, meta, db, program)
     schedule = ScheduleService(subs, meta, db, program)
