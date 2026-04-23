@@ -3,7 +3,8 @@ import argparse
 
 def build_parser(spec: dict, parser=None) -> argparse.ArgumentParser:
     if parser is None:
-        parser = argparse.ArgumentParser(description=spec.get("description", ""))
+        parser = argparse.ArgumentParser(
+                description=spec.get("description", ""))
 
     for arg in spec.get("args", []):
         flags = arg.pop("flags")
@@ -40,7 +41,11 @@ def get_parser() -> argparse.ArgumentParser:
                     "aliases": ["s"],
                     "help": "Operate on show",
                     "args": [
-                        {"flags": ["name"], "type": str, "help": "Name of the show"}
+                        {
+                            "flags": ["name"],
+                            "type": str,
+                            "help": "Name of the show"
+                        }
                     ],
                     "defaults": {"cmd_key": "show_view"},
                     "subparsers": {
@@ -83,9 +88,18 @@ def get_parser() -> argparse.ArgumentParser:
                 "day": {
                     "help": "Operate on day",
                     "defaults": {"cmd_key": "day"},
-                    "args": [{"flags": ["weekday"], "type": str, "help": "Weekday"}],
+                    "args": [
+                        {
+                            "flags": ["weekday"],
+                            "type": str,
+                            "help": "Weekday"
+                        }
+                    ],
                 },
-                "sync": {"help": "Sync files", "defaults": {"cmd_key": "sync"}},
+                "sync": {
+                        "help": "Sync files",
+                        "defaults": {"cmd_key": "sync"}
+                },
                 "season": {
                     "help": "Weekly schedule",
                     "defaults": {"cmd_key": "show_season"},
@@ -99,7 +113,10 @@ def get_parser() -> argparse.ArgumentParser:
                         },
                     },
                 },
-                "clean": {"help": "Clean torrents", "defaults": {"cmd_key": "clean"}},
+                "clean": {
+                        "help": "Clean torrents",
+                        "defaults": {"cmd_key": "clean"}
+                },
                 "latest": {
                     "help": "All latest uploads",
                     "defaults": {"cmd_key": "all_latest"},
@@ -107,7 +124,10 @@ def get_parser() -> argparse.ArgumentParser:
                 "search": {
                     "help": "Search meta data",
                     "args": [
-                        {"flags": ["name"], "type": str, "help": "Name of the show"}
+                        {
+                            "flags": ["name"],
+                            "type": str, "help": "Name of the show"
+                        }
                     ],
                     "defaults": {"cmd_key": "search_show_meta"},
                     "subparsers": {
@@ -116,7 +136,9 @@ def get_parser() -> argparse.ArgumentParser:
                         "commands": {
                             "nyaa": {
                                 "help": "Search torrents",
-                                "defaults": {"cmd_key": "search_show_torrents"},
+                                "defaults": {
+                                    "cmd_key": "search_show_torrents"
+                                },
                             }
                         },
                     },

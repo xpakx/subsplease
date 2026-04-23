@@ -214,7 +214,9 @@ class Program:
             return
 
         quality = str(self.default_quality)
-        hash = self.torrent.send_magnet_to_transmission(episode_to_get, quality)
+        hash = self.torrent.send_magnet_to_transmission(
+                episode_to_get, quality
+        )
         if not hash:
             return
         print(show.title_english)

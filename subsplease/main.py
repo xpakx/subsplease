@@ -190,7 +190,6 @@ def main():
     dispatcher.add_service('schedule', schedule)
     dispatcher.add_service('day', day)
     dispatcher.add_preprocessor('weekday', get_day)
-    # program.switch_only_tracked(args.tracked)
     sea = Seadex()
     torrent = TorrentSearchService(config, sea)
     dispatcher.add_service('torrent', torrent)

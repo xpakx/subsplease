@@ -27,10 +27,14 @@ def get_data_location() -> Path:
 
 
 class Config(msgspec.Struct, rename="camel"):
-    torrent_host: str = msgspec.field(name="torrent_provider_host", default="localhost")
-    torrent_port: int = msgspec.field(name="torrent_provider_port", default=9091)
-    torrent_username: str = msgspec.field(name="torrent_provider_username", default="test")
-    torrent_password: str = msgspec.field(name="torrent_provider_password", default="test_password")
+    torrent_host: str = msgspec.field(
+            name="torrent_provider_host", default="localhost")
+    torrent_port: int = msgspec.field(
+            name="torrent_provider_port", default=9091)
+    torrent_username: str = msgspec.field(
+            name="torrent_provider_username", default="test")
+    torrent_password: str = msgspec.field(
+            name="torrent_provider_password", default="test_password")
     library_path: Path = Path.home() / 'Videos' / 'TV Series'
     preferred_quality: int = 720
 

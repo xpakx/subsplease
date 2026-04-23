@@ -39,14 +39,16 @@ class TorrentAPI:
             return
         subprocess.run(["xdg-open", link.magnet])
 
-    def select_quality(self, episode: EpisodeData, quality: str) -> DownloadData | None:
+    def select_quality(
+            self, episode: EpisodeData, quality: str) -> DownloadData | None:
         downloads = episode.downloads
         for link in downloads:
             if link.res == quality:
                 return link
         return None
 
-    def send_magnet_to_transmission(self, episode: EpisodeData, quality: str) -> str | None:
+    def send_magnet_to_transmission(
+            self, episode: EpisodeData, quality: str) -> str | None:
         link = self.select_quality(episode, quality)
         if not link:
             return
