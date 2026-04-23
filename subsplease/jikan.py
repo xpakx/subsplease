@@ -69,3 +69,28 @@ class MetadataProvider:
             return Ok(details)
         except Exception as e:
             return Err(f"Decode error: {e}")
+
+    def get_current_season_summary(self) -> Result[list[JikanMedia], str]:
+        limit = 25
+        response = requests.get(
+            f"{self.url}seasons/now",
+            params={"limit": limit}
+        )
+
+        if response.status_code != 200:
+            return Err(f"Jikan API Error: {response.status_code}")
+
+        try:
+            raw = response.json()
+            if not raw.get("data"):
+                return Err("No results found for current season")
+
+            media_list = msgspec.convert(raw["data"], list[JikanMedia])
+            return Ok(media_list)
+        except Exception as e:
+            return Err(f"Decode error: {e}")
+
+
+if __name__ == "__main__":
+    meta = MetadataProvider()
+    print(meta.get_current_season_summary())
