@@ -22,7 +22,7 @@ from subsplease.subscription import SubscriptionService
 # MAYBE: add jikan support
 # MAYBE: tracking shows that are not on subsplease
 # MAYBE: clean finished shows
-# MAYBE: images from sakugabooru/seadex
+# MAYBE: images from seadex
 #        to check if series is worth watching
 
 

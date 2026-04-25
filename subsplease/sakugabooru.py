@@ -2,6 +2,8 @@ import msgspec
 import requests
 from subsplease.result import Result, Err, Ok
 from enum import IntEnum
+from pathlib import Path
+import time
 
 
 class SakugaTagType(IntEnum):
@@ -77,6 +79,19 @@ class SakugaBooruAPI:
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
 
+    def download_images(
+            self,
+            posts: list[BooruPost],
+            target_dir: str | None = None) -> None:
+        save_path = Path(target_dir) if target_dir else Path.cwd()
+        save_path.mkdir(parents=True, exist_ok=True)
+        for post in posts:
+            file_dest = save_path / f"{post.id}.mp4"
+            print(f"Downloading {post.id} to {file_dest}...")
+            r = requests.get(post.file_url)
+            file_dest.write_bytes(r.content)
+            time.sleep(1)
+
 
 if __name__ == "__main__":
     meta = SakugaBooruAPI()
@@ -85,3 +100,4 @@ if __name__ == "__main__":
     tag = tags.unwrap()[0]
     posts = meta.find_posts(tag.name).unwrap()
     print(posts[0])
+    meta.download_images(posts)
