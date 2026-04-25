@@ -1,6 +1,15 @@
 import msgspec
 import requests
 from subsplease.result import Result, Err, Ok
+from enum import IntEnum
+
+
+class SakugaTagType(IntEnum):
+    GENERAL = 0
+    ARTIST = 1
+    COPYRIGHT = 3
+    CHARACTER = 4
+    METADATA = 5
 
 
 class BooruTag(msgspec.Struct):
@@ -19,7 +28,7 @@ class SakugaBooruAPI:
         response = requests.get(
                 f"{self.url}tag.json", params={
                     "name": name,
-                    "type": "",
+                    "type": SakugaTagType.COPYRIGHT,
                     "order": "name"
                 })
 
