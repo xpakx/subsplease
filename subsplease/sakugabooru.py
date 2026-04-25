@@ -87,6 +87,9 @@ class SakugaBooruAPI:
         save_path.mkdir(parents=True, exist_ok=True)
         for post in posts:
             file_dest = save_path / f"{post.id}.mp4"
+            if file_dest.exists():
+                print(f"File {post.id} already downloaded")
+                continue
             print(f"Downloading {post.id} to {file_dest}...")
             r = requests.get(post.file_url)
             file_dest.write_bytes(r.content)
