@@ -16,6 +16,7 @@ class LocalShow(msgspec.Struct):
     dir_name: str | None
     tracking: bool
     current: bool
+    sakugaboru_tag: str | None
 
 
 class LocalEpisode(msgspec.Struct):
@@ -116,7 +117,8 @@ class AnimeDB:
                         dir_name = ?,
                         last_episode = ?,
                         tracking = ?,
-                        current = ?
+                        current = ?,
+                        sakugaboru_tag = ?
                     WHERE sid = ?
                 """, (
                     show.anilist_id,
@@ -128,6 +130,7 @@ class AnimeDB:
                     show.last_episode,
                     show.tracking,
                     show.current,
+                    show.sakugaboru_tag,
                     show.sid
                 ))
                 if cursor.rowcount == 0:
