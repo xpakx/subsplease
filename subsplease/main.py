@@ -207,7 +207,7 @@ def main():
     subs = SubscriptionService(program)
     dispatcher.add_service('subscriptions', subs)
     sakuga = SakugaBooruAPI()
-    images = ImageService(sakuga)
+    images = ImageService(sakuga, db)
     dispatcher.add_service('images', images)
 
     cmd_key = getattr(args, 'cmd_key', None)
