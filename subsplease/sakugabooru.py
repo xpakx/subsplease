@@ -94,13 +94,3 @@ class SakugaBooruAPI:
             r = requests.get(post.file_url)
             file_dest.write_bytes(r.content)
             time.sleep(1)
-
-
-if __name__ == "__main__":
-    meta = SakugaBooruAPI()
-    tags = meta.search_tag('tongari_boushi_no_atelier')
-    print(tags)
-    tag = tags.unwrap()[0]
-    posts = meta.find_posts(tag.name).unwrap()
-    print(posts[0])
-    meta.download_images(posts)

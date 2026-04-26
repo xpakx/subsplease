@@ -82,6 +82,10 @@ def get_parser() -> argparse.ArgumentParser:
                                 "help": "Delete show",
                                 "defaults": {"cmd_key": "show_delete"},
                             },
+                            "clips": {
+                                "help": "Download clips for given show",
+                                "defaults": {"cmd_key": "get_clips"},
+                            },
                         },
                     },
                 },

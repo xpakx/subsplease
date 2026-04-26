@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from typing import Callable, Any
 from subsplease.seadex import Seadex
 from subsplease.subscription import SubscriptionService
+from subsplease.sakugabooru import SakugaBooruAPI
+from subsplease.images import ImageService
 
 
 # MAYBE: clean up services and extract repos
@@ -174,6 +176,15 @@ def get_all_subs(subscriptions: SubscriptionService, program: Program):
         program.find_get_new_episodes()
 
 
+@dispatcher.command
+def get_clips(images: ImageService, program: Program, name: str):
+    program.select(name)
+    show = program.selection
+    if not show:
+        return
+    images.get_clips(show)
+
+
 def main():
     config = load_config()
     parser = get_parser()
@@ -195,6 +206,9 @@ def main():
     dispatcher.add_service('torrent', torrent)
     subs = SubscriptionService(program)
     dispatcher.add_service('subscriptions', subs)
+    sakuga = SakugaBooruAPI()
+    images = ImageService(sakuga)
+    dispatcher.add_service('images', images)
 
     cmd_key = getattr(args, 'cmd_key', None)
     if cmd_key:
