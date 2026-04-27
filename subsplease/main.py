@@ -20,12 +20,10 @@ from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
 
 
-# MAYBE: clean up services and extract repos
 # MAYBE: add jikan support
+# MAYBE: clean up services and extract repos
 # MAYBE: tracking shows that are not on subsplease
 # MAYBE: clean finished shows
-# MAYBE: images from seadex
-#        to check if series is worth watching
 
 
 @dataclass

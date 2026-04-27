@@ -38,6 +38,10 @@ class AniListMedia(msgspec.Struct):
     title: AniListTitle
 
 
+class AniListMediaAlts(msgspec.Struct):
+    synonyms: list[str]
+
+
 class AniListTag(msgspec.Struct):
     name: str
 
@@ -282,7 +286,34 @@ class MetadataProvider:
         except msgspec.DecodeError as e:
             return Err(f"Decode error: {e}")
 
+    def get_alt_titles(self, ani_id: int) -> Result[list[str], str]:
+        query_string = """
+        query ($id: Int) {
+          Media (id: $id, type: ANIME) {
+              synonyms
+          }
+        }
+        """
+
+        response = requests.post(
+            self.url,
+            json={'query': query_string, 'variables': {'id': ani_id}}
+        )
+
+        if response.status_code != 200:
+            return Err(f"AniList API Error: {response.status_code}")
+
+        try:
+            print(response.content)
+            data = msgspec.json.decode(
+                    response.content,
+                    type=AniListResponse[AniListMediaAlts]
+            )
+            return Ok(data.data.media)
+        except msgspec.DecodeError as e:
+            return Err(f"Decode error: {e}")
+
 
 if __name__ == "__main__":
     meta = MetadataProvider()
-    print(meta.get_current_season_summary())
+    print(meta.get_alt_titles(147105).unwrap())

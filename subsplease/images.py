@@ -3,6 +3,9 @@ from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.db import AnimeDB
 
 
+# MAYBE: stills from seadex/other sources
+
+
 class ImageService:
     def __init__(self, sakuga: SakugaBooruAPI, db: AnimeDB):
         self.sakuga = sakuga
