@@ -143,6 +143,12 @@ def get_parser() -> argparse.ArgumentParser:
                                 "defaults": {
                                     "cmd_key": "search_show_torrents"
                                 },
+                            },
+                            "seadex": {
+                                "help": "Search seadex",
+                                "defaults": {
+                                    "cmd_key": "search_show_seadex"
+                                },
                             }
                         },
                     },

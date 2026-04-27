@@ -151,6 +151,16 @@ def search_show_torrents(torrent: TorrentSearchService, name: str):
 
 
 @dispatcher.command
+def search_show_seadex(
+        program: Program, torrent: TorrentSearchService, name: str):
+    result = program.meta.search_show_details(name)
+    if result.is_err():
+        return
+    print(result)
+    torrent.search_seadex(result.unwrap().id)
+
+
+@dispatcher.command
 def clean(program: Program):
     program.fix_torrents()
 

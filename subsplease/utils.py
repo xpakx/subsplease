@@ -339,6 +339,22 @@ class TorrentSearchService:
             print(entry.size)
             print()
 
+    def search_seadex(self, show_id: int):
+        data = self.seadex.schedule(show_id)
+        if data.is_err():
+            return
+        items = data.unwrap().items
+        if len(items) == 0:
+            return
+        entries = items[0].expand.trs
+        for entry in entries:
+            print(entry.tracker)
+            print(entry.infoHash)
+            print(entry.url)
+            print(entry.created)
+            print(entry.size())
+            print()
+
 
 class ScheduleService:
     def __init__(self, api: Subsplease,
