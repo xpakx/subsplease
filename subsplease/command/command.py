@@ -1,6 +1,7 @@
 from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
+from subsplease.parser import get_parser
 
 
 @dataclass
@@ -51,3 +52,10 @@ class CommandDispatcher:
     def command(self, f):
         self.register(f.__name__, f)
         return f
+
+    def run(self):
+        parser = get_parser()
+        args = parser.parse_args()
+        cmd_key = getattr(args, 'cmd_key', None)
+        if cmd_key:
+            self.dispatch(args.cmd_key, args)

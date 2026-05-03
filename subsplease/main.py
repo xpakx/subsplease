@@ -8,7 +8,6 @@ from subsplease.utils import (
         ScheduleService
 )
 from subsplease.day import DayService
-from subsplease.parser import get_parser
 from subsplease.date import get_day
 from subsplease.config import get_data_location, load_config
 from subsplease.seadex import Seadex
@@ -142,8 +141,6 @@ def get_clips(images: ImageService, program: Program, name: str):
 
 def main():
     config = load_config()
-    parser = get_parser()
-    args = parser.parse_args()
     meta = MetadataProvider()
     db = AnimeDB(db_path=get_data_location() / 'ani.db')
     subs = Subsplease()
@@ -165,9 +162,7 @@ def main():
     images = ImageService(sakuga, db)
     dispatcher.add_service('images', images)
 
-    cmd_key = getattr(args, 'cmd_key', None)
-    if cmd_key:
-        dispatcher.dispatch(args.cmd_key, args)
+    dispatcher.run()
 
 
 if __name__ == "__main__":
