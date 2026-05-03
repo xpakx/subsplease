@@ -1,7 +1,7 @@
 from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
-from subsplease.parser import get_parser
+from subsplease.command.parser import get_parser
 
 
 @dataclass
