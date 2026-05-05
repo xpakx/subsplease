@@ -1,7 +1,7 @@
 import subprocess
 from subsplease.api import EpisodeData, DownloadData
 from subsplease.config import Config
-from transmission_rpc import Client
+from transmission_rpc import Client, Torrent
 from pathlib import Path
 import shutil
 
@@ -14,7 +14,6 @@ class TorrentAPI:
         self.password = config.torrent_password
         self.library_dir = config.library_path
 
-    # TODO: get credentials from config
     def _get_client(self) -> Client:
         return Client(
                 host=self.host,
@@ -64,11 +63,21 @@ class TorrentAPI:
         except Exception as e:
             print(f"Error: {e}")
 
+    def try_to_get_torrent(self, torrent_id: bool) -> Torrent | None:
+        try:
+            client = self._get_client()
+            torrent = client.get_torrent(torrent_id)
+            return torrent
+        except KeyError:
+            return None
+
     def check_torrent(self, torrent_id: int) -> bool:
         try:
-            c = self._get_client()
-            torrent = c.get_torrent(torrent_id)
+            torrent = self.try_to_get_torrent(torrent_id)
             print(f"Found torrent: {torrent.name}")
+            if not torrent:
+                print("Torrent not found")
+                return False
             is_done = torrent.percent_done == 1.0
             if is_done:
                 print("Torrent finished")
@@ -80,14 +89,12 @@ class TorrentAPI:
             print(f"Error: {e}")
             return False
 
-    # TODO: join with normal check
     def check_torrent_corrupted(self, torrent_id: int) -> bool:
         try:
-            c = self._get_client()
-            c.get_torrent(torrent_id)
+            torrent = self.try_to_get_torrent(torrent_id)
+            if torrent is None:
+                return True
             return False
-        except KeyError:
-            return True
         except Exception:
             return False
 
