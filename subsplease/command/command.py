@@ -2,13 +2,7 @@ from inspect import signature
 from dataclasses import dataclass
 from typing import Callable, Any
 from subsplease.command.parser import get_parser
-
-
-@dataclass
-class CommandDefiniton:
-    name: str
-    arguments: list[str]
-    func: Callable
+from subsplease.command.typedefs import CommandDefiniton
 
 
 class CommandDispatcher:
