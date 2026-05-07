@@ -23,18 +23,21 @@ from subsplease.command import CommandDispatcher
 dispatcher = CommandDispatcher()
 
 
+# show :name subscribe/sub
 @dispatcher.command
 def subscribe(program: Program, name: str, unsubscribe: bool):
     program.select(name)
     program.subscribe(not unsubscribe)
 
 
+# show :name latest
 @dispatcher.command
 def show_latest(program: Program, name: str):
     program.select(name)
     program.show_episodes()
 
 
+# show :name get
 @dispatcher.command
 def show_get(program: Program, name: str, episode: int):
     program.select(name)
@@ -44,6 +47,7 @@ def show_get(program: Program, name: str, episode: int):
         program.find_get_new_episodes()
 
 
+# show :name
 @dispatcher.command
 def show_view(program: Program, name: str):
     program.select(name)
@@ -53,22 +57,26 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
+# day :weekday
 @dispatcher.command
 def day(day: DayService, weekday: str | None):
     if weekday:
         day.show_day(weekday)
 
 
+# sync
 @dispatcher.command
 def sync(program: Program):
     program.check_downloads()
 
 
+# season
 @dispatcher.command
 def show_season(schedule: ScheduleService):
     schedule.show_schedule()
 
 
+# season update
 @dispatcher.command
 def update_season(day: DayService):
     day.update_schedule()
@@ -79,21 +87,25 @@ def today(day: DayService):
     day.today()
 
 
+# latest
 @dispatcher.command
 def all_latest(schedule: ScheduleService):
     schedule.latest()
 
 
+# search :name
 @dispatcher.command
 def search_show_meta(program: Program, name: str):
     program.view_show(name)
 
 
+# search :name nyaa
 @dispatcher.command
 def search_show_torrents(torrent: TorrentSearchService, name: str):
     torrent.search(name)
 
 
+# search :name seadex
 @dispatcher.command
 def search_show_seadex(
         program: Program, torrent: TorrentSearchService, name: str):
@@ -103,22 +115,26 @@ def search_show_seadex(
     torrent.search_seadex(result.unwrap().id)
 
 
+# clean
 @dispatcher.command
 def clean(program: Program):
     program.fix_torrents()
 
 
+# show :name delete
 @dispatcher.command
 def show_delete(program: Program, name: str):
     program.select(name)
     program.delete_show()
 
 
+# subs
 @dispatcher.command
 def show_subs(subscriptions: SubscriptionService):
     subscriptions.show_subs()
 
 
+# subs get
 @dispatcher.command
 def get_all_subs(subscriptions: SubscriptionService, program: Program):
     shows = subscriptions.get_subs()
@@ -127,6 +143,7 @@ def get_all_subs(subscriptions: SubscriptionService, program: Program):
         program.find_get_new_episodes()
 
 
+# show :name clips
 @dispatcher.command
 def get_clips(images: ImageService, program: Program, name: str):
     program.select(name)
