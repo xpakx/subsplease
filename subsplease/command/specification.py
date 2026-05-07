@@ -96,6 +96,9 @@ class CommandSpecs:
                 match = next((d for d in curr['args'] if elem.name in d['flags']), None)
                 if not match:
                     arg_type = cmd_def.argument_types.get(elem.name, str)
+                    if elem.true_type and elem.true_type != arg_type:
+                        arg_type = elem.true_type
+                        cmd_def.argument_types[elem.name] = arg_type
                     curr['args'].append({
                         'flags': [elem.name],
                         'type': arg_type,
@@ -107,6 +110,8 @@ class CommandSpecs:
                     if elem.help:
                         match['help'] = elem.help
                     arg_type = cmd_def.argument_types.get(elem.name, str)
+                    if elem.true_type:
+                        arg_type = elem.true_type
                     if arg_type != match['type']:
                         print(f"WARNING: `{elem.name}` was already defined as "
                               f"{match['type'].__name__} but `{cmd_def.name}()` "
@@ -135,9 +140,6 @@ class CommandSpecs:
     def add_flag(self, curr: dict, arg: str,
                  tp: Type[Any], cmd_def: CommandDefinition):
         self.ensure_args(curr)
-        # TODO: remove, very silly workaround
-        if arg == 'weekday':
-            return
         var = {}
         flag_def = cmd_def.flags.get(arg)
         if not flag_def:

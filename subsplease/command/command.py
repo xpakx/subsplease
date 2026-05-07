@@ -5,7 +5,6 @@ from subsplease.command.specification import CommandSpecs
 from subsplease.command.typedefs import (
         CmdElem, CmdFlag, CommandDefinition, ServiceData
 )
-from subsplease.command.parser import get_parser
 
 
 class CommandDispatcher:
@@ -112,9 +111,6 @@ class CommandDispatcher:
         return self
 
     def run(self):
-        # TODO: remove
-        self.specs.specs = get_parser()
-
         self.prepare_commands()
         parser = self.specs.parser()
         args = parser.parse_args()

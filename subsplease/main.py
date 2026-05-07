@@ -60,9 +60,7 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
-# TODO: !!! weekday currently do not work with new system
-# day :weekday
-@dispatcher.command
+@dispatcher.command(['day', CmdArg('weekday', help='Weekday', true_type=str)])
 def day(day: DayService, weekday: str | None):
     if weekday:
         day.show_day(weekday)
