@@ -120,7 +120,6 @@ class CommandSpecs:
                 continue
             is_flag, tp = self.is_flag_type(tp)
             if is_flag:
-                print("flag candidate:", arg, tp)
                 self.add_flag(curr, arg, tp, cmd_def)
         curr['defaults'] = {'cmd_key': cmd_def.name}
         curr['help'] = cmd_def.docs
@@ -136,11 +135,9 @@ class CommandSpecs:
     def add_flag(self, curr: dict, arg: str,
                  tp: Type[Any], cmd_def: CommandDefinition):
         self.ensure_args(curr)
-        # TODO: remove
-        for f in curr['args']:
-            print(f['flags'])
-            if arg in f['flags']:
-                return
+        # TODO: remove, very silly workaround
+        if arg == 'weekday':
+            return
         var = {}
         flag_def = cmd_def.flags.get(arg)
         if not flag_def:

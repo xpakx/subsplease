@@ -11,7 +11,7 @@ from subsplease.seadex import Seadex
 from subsplease.subscription import SubscriptionService
 from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
-from subsplease.command import CommandDispatcher
+from subsplease.command import CommandDispatcher, CmdArg
 
 
 # MAYBE: add jikan support
@@ -23,23 +23,25 @@ from subsplease.command import CommandDispatcher
 dispatcher = CommandDispatcher()
 
 
-# show :name subscribe/sub
-@dispatcher.command
+# TODO: subscribe should be aliased as sub
+@dispatcher.command(['show', ':name', 'subscribe'])
+@dispatcher.flag('unsubscribe', aliases=['-s'], help='Unsubscribe the show')
 def subscribe(program: Program, name: str, unsubscribe: bool):
     program.select(name)
     program.subscribe(not unsubscribe)
 
 
-# show :name latest
-@dispatcher.command
+@dispatcher.command(['show', ':name', 'latest'])
 def show_latest(program: Program, name: str):
+    """Latest episodes for the show"""
     program.select(name)
     program.show_episodes()
 
 
-# show :name get
-@dispatcher.command
+@dispatcher.command(['show', ':name', 'get'])
+@dispatcher.flag('episode', aliases=['-e'], help='episode number')
 def show_get(program: Program, name: str, episode: int):
+    """Get episode(s) of the show"""
     program.select(name)
     if episode:
         program.find_and_get_episode(episode)
@@ -47,9 +49,10 @@ def show_get(program: Program, name: str, episode: int):
         program.find_get_new_episodes()
 
 
-# show :name
-@dispatcher.command
+# TODO: show should be aliased as s
+@dispatcher.command(['show', CmdArg('name', help='Name of the show')])
 def show_view(program: Program, name: str):
+    '''Operate on show'''
     program.select(name)
     if program.is_show_selected():
         program.view_selected_show()
@@ -57,6 +60,7 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
+# TODO: !!! weekday currently do not work with new system
 # day :weekday
 @dispatcher.command
 def day(day: DayService, weekday: str | None):
@@ -64,21 +68,21 @@ def day(day: DayService, weekday: str | None):
         day.show_day(weekday)
 
 
-# sync
 @dispatcher.command
 def sync(program: Program):
+    '''Sync files'''
     program.check_downloads()
 
 
-# season
-@dispatcher.command
+@dispatcher.command(name='season')
 def show_season(schedule: ScheduleService):
+    '''Weekly schedule'''
     schedule.show_schedule()
 
 
-# season update
-@dispatcher.command
+@dispatcher.command(['season', 'update'])
 def update_season(day: DayService):
+    '''Update schedule'''
     day.update_schedule()
 
 
@@ -87,65 +91,66 @@ def today(day: DayService):
     day.today()
 
 
-# latest
-@dispatcher.command
+@dispatcher.command(name='latest')
 def all_latest(schedule: ScheduleService):
+    '''All latest uploads'''
     schedule.latest()
 
 
-# search :name
-@dispatcher.command
+@dispatcher.command(['search', CmdArg('name', help='Name of the show')])
 def search_show_meta(program: Program, name: str):
+    '''Search metadata'''
     program.view_show(name)
 
 
-# search :name nyaa
-@dispatcher.command
+@dispatcher.command(['search', ':name', 'nyaa'])
 def search_show_torrents(torrent: TorrentSearchService, name: str):
+    '''Search torrents'''
     torrent.search(name)
 
 
-# search :name seadex
-@dispatcher.command
+@dispatcher.command(['search', ':name', 'seadex'])
 def search_show_seadex(
         program: Program, torrent: TorrentSearchService, name: str):
+    '''Search seadex'''
+    torrent.search(name)
     result = program.meta.search_show_details(name)
     if result.is_err():
         return
     torrent.search_seadex(result.unwrap().id)
 
 
-# clean
 @dispatcher.command
 def clean(program: Program):
+    '''Clean torrents'''
     program.fix_torrents()
 
 
-# show :name delete
-@dispatcher.command
+@dispatcher.command(['show', ':name', 'delete'])
 def show_delete(program: Program, name: str):
+    '''Delete show'''
     program.select(name)
     program.delete_show()
 
 
-# subs
-@dispatcher.command
+@dispatcher.command(name='subs')
 def show_subs(subscriptions: SubscriptionService):
+    '''Show subscribed shows'''
     subscriptions.show_subs()
 
 
-# subs get
-@dispatcher.command
+@dispatcher.command(['subs', 'get'])
 def get_all_subs(subscriptions: SubscriptionService, program: Program):
+    '''Get all new episodes of subscribed shows'''
     shows = subscriptions.get_subs()
     for show in shows:
         program.select_raw(show)
         program.find_get_new_episodes()
 
 
-# show :name clips
-@dispatcher.command
+@dispatcher.command(['show', ':name', 'clips'])
 def get_clips(images: ImageService, program: Program, name: str):
+    '''Download clips for a given show'''
     program.select(name)
     show = program.selection
     if not show:
