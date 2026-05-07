@@ -61,7 +61,8 @@ class CommandDefinition:
     func: Callable
     docs: str | None
     flags: dict[str, CmdFlag]
-    path: str | list[CmdElem] | None = None,
+    path: str | list[CmdElem] | None = None
+    aliases: list[str] | None = None
 
 
 @dataclass

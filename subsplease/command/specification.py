@@ -126,6 +126,9 @@ class CommandSpecs:
             is_flag, tp = self.is_flag_type(tp)
             if is_flag:
                 self.add_flag(curr, arg, tp, cmd_def)
+        if cmd_def.aliases:
+            aliases = curr.setdefault('aliases', [])
+            aliases.extend(cmd_def.aliases)
         curr['defaults'] = {'cmd_key': cmd_def.name}
         curr['help'] = cmd_def.docs
 

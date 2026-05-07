@@ -23,8 +23,7 @@ from subsplease.command import CommandDispatcher, CmdArg
 dispatcher = CommandDispatcher()
 
 
-# TODO: subscribe should be aliased as sub
-@dispatcher.command(['show', ':name', 'subscribe'])
+@dispatcher.command(['show', ':name', 'subscribe'], aliases=['sub'])
 @dispatcher.flag('unsubscribe', aliases=['-s'], help='Unsubscribe the show')
 def subscribe(program: Program, name: str, unsubscribe: bool):
     program.select(name)
@@ -49,8 +48,8 @@ def show_get(program: Program, name: str, episode: int):
         program.find_get_new_episodes()
 
 
-# TODO: show should be aliased as s
-@dispatcher.command(['show', CmdArg('name', help='Name of the show')])
+@dispatcher.command(['show', CmdArg('name', help='Name of the show')],
+                    aliases=['s'])
 def show_view(program: Program, name: str):
     '''Operate on show'''
     program.select(name)

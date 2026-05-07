@@ -20,7 +20,8 @@ class CommandDispatcher:
             name: str,
             command: Callable,
             path: str | list[CmdElem] | None = None,
-            flags: list[CmdFlag] | None = None
+            flags: list[CmdFlag] | None = None,
+            aliases: list[str] | None = None,
     ):
         sig = signature(command)
         args = list(sig.parameters.keys())
@@ -42,6 +43,7 @@ class CommandDispatcher:
                 docs=docs,
                 flags=flag_dict,
                 path=path,
+                aliases=aliases
         )
         self.commands[name] = cmd_def
 
@@ -82,6 +84,7 @@ class CommandDispatcher:
             *,
             name: str | None = None,
             flags: list[CmdFlag] | None = None,
+            aliases: list[str] | None = None,
     ):
         func = None
         if callable(path):
@@ -91,7 +94,7 @@ class CommandDispatcher:
         def decorator(f: Callable):
             registration_name = name if name else f.__name__
             self.register(registration_name, f,
-                          path=path, flags=flags)
+                          path=path, flags=flags, aliases=aliases)
             return f
         if func:
             return decorator(func)
@@ -104,10 +107,11 @@ class CommandDispatcher:
             *,
             name: str | None = None,
             flags: list[CmdFlag] | None = None,
+            aliases: list[str] | None = None,
     ) -> Self:
         registration_name = name if name else method.__name__
         self.register(registration_name, method,
-                      path=path, flags=flags)
+                      path=path, flags=flags, aliases=aliases)
         return self
 
     def run(self):
