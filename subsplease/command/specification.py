@@ -71,22 +71,25 @@ class CommandSpecs:
                 fragment_list.append(CmdCmd(fragment))
         return fragment_list
 
+    def prepare_path(self, cmd_def: CommandDefinition) -> list[PathPart]:
+        path = cmd_def.path
+        if path is None:
+            return [CmdCmd(cmd_def.name)]
+        if not path:
+            return []
+        if type(path) is str:
+            return self.parse_path(path)
+        return self.transform_cmd_elems(path)
+
     def add_to_specs(
             self,
             cmd_def: CommandDefinition
     ):
-        path = cmd_def.path
-        if type(path) is str:
-            parsed_path = self.parse_path(path)
-        elif not path:
-            parsed_path = [CmdCmd(cmd_def.name)]
-        else:
-            parsed_path = self.transform_cmd_elems(path)
-
+        path = self.prepare_path(cmd_def)
         curr = self.specs
         curr_command = None
         used_args = set()
-        for elem in parsed_path:
+        for elem in path:
             if is_cmd(elem):
                 self.ensure_subparsers(curr, curr_command)
                 curr = curr['subparsers']['commands'].setdefault(elem.name, {})

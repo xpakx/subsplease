@@ -83,7 +83,7 @@ def update_season(day: DayService):
     day.update_schedule()
 
 
-@dispatcher.command
+@dispatcher.command([])
 def today(day: DayService):
     day.today()
 
