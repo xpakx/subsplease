@@ -26,13 +26,14 @@ dispatcher = CommandDispatcher()
 @dispatcher.command(['show', ':name', 'subscribe'], aliases=['sub'])
 @dispatcher.flag('unsubscribe', aliases=['-s'], help='Unsubscribe the show')
 def subscribe(program: Program, name: str, unsubscribe: bool):
+    '''Subscribe the show'''
     program.select(name)
     program.subscribe(not unsubscribe)
 
 
 @dispatcher.command(['show', ':name', 'latest'])
 def show_latest(program: Program, name: str):
-    """Latest episodes for the show"""
+    '''Latest episodes for the show'''
     program.select(name)
     program.show_episodes()
 
@@ -40,7 +41,7 @@ def show_latest(program: Program, name: str):
 @dispatcher.command(['show', ':name', 'get'])
 @dispatcher.flag('episode', aliases=['-e'], help='episode number')
 def show_get(program: Program, name: str, episode: int):
-    """Get episode(s) of the show"""
+    '''Get episode(s) of the show'''
     program.select(name)
     if episode:
         program.find_and_get_episode(episode)
@@ -61,6 +62,7 @@ def show_view(program: Program, name: str):
 
 @dispatcher.command(['day', CmdArg('weekday', help='Weekday', true_type=str)])
 def day(day: DayService, weekday: str | None):
+    '''Show schedule for day'''
     if weekday:
         day.show_day(weekday)
 
