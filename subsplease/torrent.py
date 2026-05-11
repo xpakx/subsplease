@@ -63,7 +63,7 @@ class TorrentAPI:
         except Exception as e:
             print(f"Error: {e}")
 
-    def try_to_get_torrent(self, torrent_id: bool) -> Torrent | None:
+    def try_to_get_torrent(self, torrent_id: int) -> Torrent | None:
         try:
             client = self._get_client()
             torrent = client.get_torrent(torrent_id)
@@ -74,8 +74,9 @@ class TorrentAPI:
     def check_torrent(self, torrent_id: int) -> bool:
         try:
             torrent = self.try_to_get_torrent(torrent_id)
-            print(f"Found torrent: {torrent.name}")
-            if not torrent:
+            if torrent:
+                print(f"Found torrent: {torrent.name}")
+            else:
                 print("Torrent not found")
                 return False
             is_done = torrent.percent_done == 1.0

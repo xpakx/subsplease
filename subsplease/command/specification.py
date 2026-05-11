@@ -39,7 +39,7 @@ class CommandSpecs:
         if is_union:
             non_none_args = [arg for arg in args if arg is not type(None)]
             if len(non_none_args) == 1:
-                return self.is_flag_type(non_none_args[0]), tp
+                return self.is_flag_type(non_none_args[0])
             return False, None
 
         return False, None
@@ -62,7 +62,7 @@ class CommandSpecs:
     def transform_cmd_elems(self, path: list[CmdElem]) -> list[PathPart]:
         fragment_list: list[PathPart] = []
         for fragment in path:
-            if type(fragment) is CmdArg:
+            if isinstance(fragment, CmdArg):
                 fragment_list.append(fragment)
             elif fragment.startswith(':'):
                 value = fragment[1:]
@@ -77,7 +77,7 @@ class CommandSpecs:
             return [CmdCmd(cmd_def.name)]
         if not path:
             return []
-        if type(path) is str:
+        if isinstance(path, str):
             return self.parse_path(path)
         return self.transform_cmd_elems(path)
 
@@ -128,7 +128,7 @@ class CommandSpecs:
                 continue
             is_flag, tp = self.is_flag_type(tp)
             if is_flag:
-                self.add_flag(curr, arg, tp, cmd_def)
+                self.add_flag(curr, arg, tp if tp else str, cmd_def)
         if cmd_def.aliases:
             aliases = curr.setdefault('aliases', [])
             aliases.extend(cmd_def.aliases)
@@ -146,7 +146,7 @@ class CommandSpecs:
     def add_flag(self, curr: dict, arg: str,
                  tp: Type[Any], cmd_def: CommandDefinition):
         self.ensure_args(curr)
-        var = {}
+        var: dict[str, Any] = {}
         flag_def = cmd_def.flags.get(arg)
         if not flag_def:
             flag_def = CmdFlag(arg)

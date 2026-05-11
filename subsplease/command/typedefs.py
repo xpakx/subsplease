@@ -34,9 +34,10 @@ class CmdFlag:
             help: str | None = None,
     ):
         self.name = name
-        if type(aliases) is str:
+        self.aliases: list[str] = []
+        if isinstance(aliases, str):
             self.aliases = [aliases]
-        else:
+        elif aliases is not None:
             self.aliases = aliases
         self.help = help
 

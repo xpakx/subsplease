@@ -81,7 +81,7 @@ class CommandDispatcher:
 
     def command(
             self,
-            path: str | list[CmdElem] | None = None,
+            path: str | list[CmdElem] | None | Callable = None,
             *,
             name: str | None = None,
             flags: list[CmdFlag] | None = None,
