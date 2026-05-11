@@ -72,7 +72,8 @@ class CommandDispatcher:
                 value = vs.get(elem)
                 tp = cmd.argument_types.get(elem)
                 if tp and tp is not str and tp is not Any:
-                    value = tp(value)
+                    # TODO: correctly process optional fields
+                    value = tp(value) if value is not None else None
                 if elem in self.preprocessors:
                     value = self.preprocessors[elem](value)
                 kwargs[elem] = value
