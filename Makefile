@@ -1,4 +1,4 @@
-.PHONY: run mypy types test build install uninstall
+.PHONY: run types test build install uninstall
 
 all: run
 
