@@ -107,7 +107,7 @@ class Program:
                 self.db.update_episode(ep)
 
     def select_show(self, query: str):
-        options = [self.current[x].title_english for x in self.current.keys()]
+        options = [self.current[x].title() for x in self.current.keys()]
         best_match = process.extractOne(
                 query,
                 options,
@@ -163,7 +163,7 @@ class Program:
         show = self.selection
         if not show:
             return
-        print(show.title_english)
+        print(show.title())
         show = self.db.toggle_tracking(show.sid, track)
 
     def view_selected_show(self):

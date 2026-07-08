@@ -143,9 +143,7 @@ def display_subs(data: list[LocalShow]):
     table.add_column("Last episode", justify="center", width=12)
 
     for num, entry in enumerate(data):
-        title = entry.title_english
-
-        title = f"[dim]{entry.title_english}[/dim]"
+        title = f"[dim]{entry.title()}[/dim]"
         episode = f"[dim]{entry.last_episode}[/dim]"
 
         table.add_row(title, episode)

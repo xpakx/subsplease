@@ -18,6 +18,9 @@ class LocalShow(msgspec.Struct):
     current: bool
     sakugaboru_tag: str | None
 
+    def title(self) -> str:
+        return self.title_english or self.title_romaji
+
 
 class LocalEpisode(msgspec.Struct):
     id: int
