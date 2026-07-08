@@ -88,7 +88,9 @@ class Program:
             if not show:
                 continue
             if not show.dir_name:
-                continue
+                show.dir_name = self.get_show_dir(show)
+                if not show.dir_name:
+                    continue
             print(ep.episode, show.title_english)
             finished = self.torrent.check_torrent(ep.torrent_hash)
             if finished:
