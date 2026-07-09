@@ -1,6 +1,7 @@
 from subsplease.api import Schedule, ScheduleEntry, EpisodeData
 from subsplease.db import LocalShow
 from subsplease.metadata import AniListMediaDetails
+from subsplease.jikan import JikanMediaDetails
 from rich.console import Console
 from rich.table import Table
 from rich import box
@@ -149,3 +150,28 @@ def display_subs(data: list[LocalShow]):
         table.add_row(title, episode)
 
     console.print(table)
+
+
+def display_details_jikan(show: JikanMediaDetails):
+    console = Console()
+
+    clean_desc = show.details or "No description."
+    title = show.title_english or show.title_japanese
+    status_color = "green" if show.status == "RELEASING" else "blue"
+    status_info = f"[{status_color}]{show.status}[/{status_color}]"
+    # TODO: tags
+
+    content = Text()
+    content.append(f"{clean_desc}\n\n", style="white")
+
+    panel = Panel(
+        content,
+        title=f"[bold yellow]{title}[/]",
+        subtitle=f"{status_info}",
+        expand=False,
+        border_style="bright_blue",
+        padding=(1, 2)
+    )
+
+    console.print(panel)
+    console.print("\n")

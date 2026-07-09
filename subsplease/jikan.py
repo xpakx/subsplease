@@ -17,7 +17,7 @@ class JikanMediaDetails(msgspec.Struct):
     status: str
 
 
-class MetadataProvider:
+class JikanMetadataProvider:
     def __init__(self):
         self.url = "https://api.jikan.moe/v4/"
 
@@ -92,5 +92,5 @@ class MetadataProvider:
 
 
 if __name__ == "__main__":
-    meta = MetadataProvider()
+    meta = JikanMetadataProvider()
     print(meta.get_current_season_summary())

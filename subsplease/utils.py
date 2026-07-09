@@ -1,9 +1,11 @@
 from subsplease.api import Subsplease, EpisodeData
 from subsplease.metadata import MetadataProvider
+from subsplease.jikan import JikanMetadataProvider
 from subsplease.db import AnimeDB, LocalShow
 from subsplease.display import (
         display_latest,
-        display_details
+        display_details,
+        display_details_jikan
 )
 from subsplease.torrent import TorrentAPI
 from subsplease.config import Config
@@ -19,9 +21,10 @@ from rich.prompt import Confirm
 class Program:
     def __init__(self, config: Config, api: Subsplease,
                  meta: MetadataProvider, db: AnimeDB,
-                 torrent: TorrentAPI):
+                 torrent: TorrentAPI, jikan: JikanMetadataProvider):
         self.subs = api
         self.meta = meta
+        self.jikan = jikan
         self.db = db
         self.only_tracked = False
         self.current: dict[str, LocalShow] = {}
@@ -341,3 +344,11 @@ class Program:
             print("Folder removed successfully.")
         except OSError as e:
             print(f"Error: {e.strerror}")
+
+    def view_show_jikan(self, title: str):
+        print(f"Searching '{title}'")
+        result = self.jikan.search_show_details(title)
+        if result.is_ok():
+            display_details_jikan(result.ok())
+        else:
+            print(result.err())

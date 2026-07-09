@@ -12,9 +12,9 @@ from subsplease.subscription import SubscriptionService
 from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
 from subsplease.command import CommandDispatcher, CmdArg
+from subsplease.jikan import JikanMetadataProvider
 
 
-# MAYBE: add jikan support
 # MAYBE: clean up services and extract repos
 # MAYBE: tracking shows that are not on subsplease
 # MAYBE: clean finished shows
@@ -102,6 +102,12 @@ def search_show_meta(program: Program, name: str):
     program.view_show(name)
 
 
+@dispatcher.command(['search', ':name', 'jikan'])
+def search_show_jikan(program: Program, name: str):
+    '''Search metadata on jikan'''
+    program.view_show_jikan(name)
+
+
 @dispatcher.command(['search', ':name', 'nyaa'])
 def search_show_torrents(torrent: TorrentSearchService, name: str):
     '''Search torrents'''
@@ -169,10 +175,11 @@ def update_metadata(program: Program, name: str, title: str):
 def main():
     config = load_config()
     meta = MetadataProvider()
+    jikan = JikanMetadataProvider()
     db = AnimeDB(db_path=get_data_location() / 'ani.db')
     subs = Subsplease()
     torrent = TorrentAPI(config)
-    program = Program(config, subs, meta, db, torrent)
+    program = Program(config, subs, meta, db, torrent, jikan)
     day = DayService(subs, meta, db, program)
     schedule = ScheduleService(subs, meta, db, program)
     program.load_shows()
