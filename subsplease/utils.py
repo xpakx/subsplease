@@ -62,7 +62,7 @@ class Program:
             if res:
                 return
         no_season = re.sub(r'(?i)\bs\d+\b', '', title)
-        if title == no_season:
+        if title != no_season:
             res = self.do_fetch_show(no_season, show)
 
     def view_show(self, title: str):
