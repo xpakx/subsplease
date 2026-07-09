@@ -53,17 +53,14 @@ class Program:
             return False
 
     def fetch_show(self, title: str, show: LocalShow):
-        res = self.do_fetch_show(title, show)
-        if res:
+        if self.do_fetch_show(title, show):
             return
         no_s = re.sub(r'(?i)\bs(\d+)', r'\1', title)
-        if title != no_s:
-            res = self.do_fetch_show(no_s, show)
-            if res:
-                return
-        no_season = re.sub(r'(?i)\bs\d+\b', '', title)
-        if title != no_season:
-            res = self.do_fetch_show(no_season, show)
+        if title != no_s and self.do_fetch_show(no_s, show):
+            return
+        no_season = re.sub(r'(?i)\bs\d+\b', '', title).strip()
+        if title != no_season and self.do_fetch_show(no_season, show):
+            return
 
     def view_show(self, title: str):
         print(f"Searching '{title}'")
