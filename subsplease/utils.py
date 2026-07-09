@@ -36,8 +36,8 @@ class Program:
     def switch_only_tracked(self, value: bool):
         self.only_tracked = value
 
-    def fetch_show(self, title: str, show: LocalShow):
-        print("Fetching")
+    def do_fetch_show(self, title: str, show: LocalShow) -> bool:
+        print(f"Fetching {title}")
         result = self.meta.search_show(title)
         if result.is_ok():
             ani_list_show = result.unwrap()
@@ -46,11 +46,32 @@ class Program:
             show.anilist_id = ani_list_show.id
             show.dir_name = self.get_show_dir(show)
             self.db.update_show(show)
+            return True
+        else:
+            err = result.err()
+            print(err)
+            return False
+
+    def fetch_show(self, title: str, show: LocalShow):
+        res = self.do_fetch_show(title, show)
+        if res:
+            return
+        no_s = re.sub(r'(?i)\bs(\d+)', r'\1', title)
+        if title != no_s:
+            res = self.do_fetch_show(no_s, show)
+            if res:
+                return
+        no_season = re.sub(r'(?i)\bs\d+\b', '', title)
+        if title == no_season:
+            res = self.do_fetch_show(no_season, show)
 
     def view_show(self, title: str):
         print(f"Searching '{title}'")
-        result = self.meta.search_show_details(title).unwrap()
-        display_details(result)
+        result = self.meta.search_show_details(title)
+        if result.is_ok():
+            display_details(result.ok())
+        else:
+            print(result.err())
 
     def get_show_dir(self, show: LocalShow) -> str | None:
         name = show.title_english or show.title_romaji
@@ -231,7 +252,7 @@ class Program:
         show = self.selection
         if not show:
             return
-        print(show.title_english)
+        print(show.title())
         show_id = show.subsplease_id
         if not show_id:
             show_id = self.subs.get_sid(show.sid).unwrap()
