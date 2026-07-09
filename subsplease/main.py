@@ -157,6 +157,15 @@ def get_clips(images: ImageService, program: Program, name: str):
     images.get_clips(show)
 
 
+@dispatcher.command(['show', ':name', 'update', ':title'])
+def update_metadata(program: Program, name: str, title: str):
+    '''Force updating show metadata'''
+    program.select(name)
+    if not program.selection:
+        return
+    program.fetch_show(title, program.selection)
+
+
 def main():
     config = load_config()
     meta = MetadataProvider()
