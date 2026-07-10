@@ -24,7 +24,7 @@ dispatcher = CommandDispatcher()
 
 
 @dispatcher.command(['show', ':name', 'subscribe'], aliases=['sub'])
-@dispatcher.flag('unsubscribe', aliases=['-s'], help='Unsubscribe the show')
+@dispatcher.flag('unsubscribe', aliases=['-u'], help='Unsubscribe the show')
 def subscribe(program: Program, name: str, unsubscribe: bool):
     '''Subscribe the show'''
     program.select(name)
