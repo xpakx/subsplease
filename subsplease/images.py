@@ -24,7 +24,7 @@ class ImageService:
         tag = tag_list[0]
         return tag.name
 
-    def get_clips(self, show: LocalShow) -> None:
+    def get_clips(self, show: LocalShow, path: str | None = None) -> None:
         if not show.sakugaboru_tag:
             print("no tag yet")
             # TODO sometimes romaji title in our db is shortend
@@ -42,4 +42,4 @@ class ImageService:
             print(f"Couldn't find sakugabooru tag for {show.title_english}")
 
         posts = self.sakuga.find_posts(tag).unwrap()
-        self.sakuga.download_images(posts)
+        self.sakuga.download_images(posts, target_dir=path)

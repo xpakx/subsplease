@@ -154,13 +154,15 @@ def get_all_subs(subscriptions: SubscriptionService, program: Program):
 
 
 @dispatcher.command(['show', ':name', 'clips'])
-def get_clips(images: ImageService, program: Program, name: str):
+@dispatcher.flag('path', aliases=['-p'], help='Path to save')
+def get_clips(
+        images: ImageService, program: Program, name: str, path: str):
     '''Download clips for a given show'''
     program.select(name)
     show = program.selection
     if not show:
         return
-    images.get_clips(show)
+    images.get_clips(show, path)
 
 
 @dispatcher.command(['show', ':name', 'update', ':title'])
