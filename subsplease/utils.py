@@ -69,7 +69,7 @@ class Program:
         print(f"Searching '{title}'")
         result = self.meta.search_show_details(title)
         if result.is_ok():
-            display_details(result.ok())
+            display_details(result.unwrap())
         else:
             print(result.err())
 
@@ -349,6 +349,6 @@ class Program:
         print(f"Searching '{title}'")
         result = self.jikan.search_show_details(title)
         if result.is_ok():
-            display_details_jikan(result.ok())
+            display_details_jikan(result.unwrap())
         else:
             print(result.err())
