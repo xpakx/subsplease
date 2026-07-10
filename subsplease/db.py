@@ -8,6 +8,7 @@ class LocalShow(msgspec.Struct):
     id: int
     sid: str   # subsplease link
     anilist_id: int | None
+    jikan_id: int | None
     subsplease_id: int | None
     title_romaji: str
     title_english: str | None
@@ -121,7 +122,8 @@ class AnimeDB:
                         last_episode = ?,
                         tracking = ?,
                         current = ?,
-                        sakugaboru_tag = ?
+                        sakugaboru_tag = ?,
+                        jikan_id = ?
                     WHERE sid = ?
                 """, (
                     show.anilist_id,
@@ -134,6 +136,7 @@ class AnimeDB:
                     show.tracking,
                     show.current,
                     show.sakugaboru_tag,
+                    show.jikan_id,
                     show.sid
                 ))
                 if cursor.rowcount == 0:
