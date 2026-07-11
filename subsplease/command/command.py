@@ -57,6 +57,12 @@ class CommandDispatcher:
     def add_preprocessor(self, name: str, processor: Callable):
         self.preprocessors[name] = processor
 
+    def transform_arg(self, value: str | None, tp: Any):
+        # TODO: correctly process optional fields
+        if tp and tp is not str and tp is not Any:
+            return tp(value) if value is not None else None
+        return value
+
     def dispatch(self, name, args):
         cmd = self.commands.get(name)
         if not cmd:
@@ -71,9 +77,7 @@ class CommandDispatcher:
             else:
                 value = vs.get(elem)
                 tp = cmd.argument_types.get(elem)
-                if tp and tp is not str and tp is not Any:
-                    # TODO: correctly process optional fields
-                    value = tp(value) if value is not None else None
+                value = self.transform_arg(value, tp)
                 if elem in self.preprocessors:
                     value = self.preprocessors[elem](value)
                 kwargs[elem] = value
