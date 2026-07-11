@@ -57,9 +57,22 @@ class CommandDispatcher:
     def add_preprocessor(self, name: str, processor: Callable):
         self.preprocessors[name] = processor
 
-    def transform_arg(self, value: str | None, tp: Any):
+    def transform_arg(self, value, tp: Any):
+        if not tp or tp is Any:
+            return value
+        if isinstance(value, tp):
+            return value
+        if tp is str:
+            return value
+        if tp is int:
+            return int(value) if value is not None else None
+        if tp is float:
+            return float(value) if value is not None else None
+        if tp is bool:
+            return True if value is not None else False
         # TODO: correctly process optional fields
-        if tp and tp is not str and tp is not Any:
+        # TODO: only if constructor accept single arg
+        if tp is not Any:
             return tp(value) if value is not None else None
         return value
 
