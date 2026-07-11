@@ -67,11 +67,8 @@ class CommandDispatcher:
                 tp = args[1] if args[0] is type(None) else args[0]
         return tp
 
-    # TODO: we actually shouldn't need that, as argparse
-    # parses most things; but we will remove that after
-    # adding some tests first
+    # TODO: this could be safely removed after we'll fix preprocessors
     def transform_arg(self, value, tp: Any):
-        # TODO: correctly process optional fields for transformed
         if not tp or tp is Any:
             return value
         tp = self.unpack_optional(tp)
@@ -86,13 +83,13 @@ class CommandDispatcher:
         if tp is bool:
             return True if value is not None else False
 
-        # TODO: only if constructor accept single arg of correct type
         if tp is not Any:
             return tp(value) if value is not None else None
         return value
 
     # TODO: we actually shouldn't need that, as argparse
-    # parses most things
+    # parses most things; but we will remove that after
+    # adding some tests first
     def preprocess_arg(self, value, tp, preprocessor):
         sig = signature(preprocessor)
         params = [p for p in sig.parameters.values()]
@@ -123,8 +120,6 @@ class CommandDispatcher:
                 if elem in self.preprocessors:
                     preprocessor = self.preprocessors[elem]
                     value = self.preprocess_arg(value, tp, preprocessor)
-                else:
-                    value = self.transform_arg(value, tp)
                 kwargs[elem] = value
         cmd.func(**kwargs)
 

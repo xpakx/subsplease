@@ -137,6 +137,7 @@ class CommandSpecs:
             if not tp or arg in used_args:
                 continue
             is_flag, tp = self.is_flag_type(tp)
+            tp = self.unpack_optional(tp)
             if is_flag:
                 self.add_flag(curr, arg, tp if tp else str, cmd_def)
         if cmd_def.aliases:
