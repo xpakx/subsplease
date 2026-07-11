@@ -1,4 +1,6 @@
-from typing import Callable, Any, Self
+from typing import Callable, Any, Self, get_origin
+from typing import Union, get_args
+from types import UnionType
 from inspect import signature, getdoc
 
 from subsplease.command.specification import CommandSpecs
@@ -57,9 +59,19 @@ class CommandDispatcher:
     def add_preprocessor(self, name: str, processor: Callable):
         self.preprocessors[name] = processor
 
+    def unpack_optional(self, tp):
+        origin = get_origin(tp)
+        if origin is Union or origin is UnionType:
+            args = get_args(tp)
+            if len(args) == 2 and type(None) in args:
+                tp = args[1] if args[0] is type(None) else args[0]
+        return tp
+
     def transform_arg(self, value, tp: Any):
+        # TODO: correctly process optional fields for transformed
         if not tp or tp is Any:
             return value
+        tp = self.unpack_optional(tp)
         if isinstance(value, tp):
             return value
         if tp is str:
@@ -70,8 +82,8 @@ class CommandDispatcher:
             return float(value) if value is not None else None
         if tp is bool:
             return True if value is not None else False
-        # TODO: correctly process optional fields
-        # TODO: only if constructor accept single arg
+
+        # TODO: only if constructor accept single arg of correct type
         if tp is not Any:
             return tp(value) if value is not None else None
         return value

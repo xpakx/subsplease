@@ -40,7 +40,7 @@ def show_latest(program: Program, name: str):
 
 @dispatcher.command(['show', ':name', 'get'])
 @dispatcher.flag('episode', aliases=['-e'], help='episode number')
-def show_get(program: Program, name: str, episode: int):
+def show_get(program: Program, name: str, episode: int | None):
     '''Get episode(s) of the show'''
     program.select(name)
     if episode:
@@ -156,7 +156,7 @@ def get_all_subs(subscriptions: SubscriptionService, program: Program):
 @dispatcher.command(['show', ':name', 'clips'])
 @dispatcher.flag('path', aliases=['-p'], help='Path to save')
 def get_clips(
-        images: ImageService, program: Program, name: str, path: str):
+        images: ImageService, program: Program, name: str, path: str | None):
     '''Download clips for a given show'''
     program.select(name)
     show = program.selection
