@@ -60,7 +60,7 @@ def show_view(program: Program, name: str):
         program.view_show(name)
 
 
-@dispatcher.command(['day', CmdArg('weekday', help='Weekday', true_type=str)])
+@dispatcher.command(['day', CmdArg('weekday', help='Weekday')])
 def day(day: DayService, weekday: str | None):
     '''Show schedule for day'''
     if weekday:

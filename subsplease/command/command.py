@@ -1,7 +1,7 @@
 from typing import Callable, Any, Self, get_origin
 from typing import Union, get_args
 from types import UnionType
-from inspect import signature, getdoc
+from inspect import signature, getdoc, Parameter
 
 from subsplease.command.specification import CommandSpecs
 from subsplease.command.typedefs import (
@@ -67,6 +67,9 @@ class CommandDispatcher:
                 tp = args[1] if args[0] is type(None) else args[0]
         return tp
 
+    # TODO: we actually shouldn't need that, as argparse
+    # parses most things; but we will remove that after
+    # adding some tests first
     def transform_arg(self, value, tp: Any):
         # TODO: correctly process optional fields for transformed
         if not tp or tp is Any:
@@ -88,6 +91,21 @@ class CommandDispatcher:
             return tp(value) if value is not None else None
         return value
 
+    # TODO: we actually shouldn't need that, as argparse
+    # parses most things
+    def preprocess_arg(self, value, tp, preprocessor):
+        sig = signature(preprocessor)
+        params = [p for p in sig.parameters.values()]
+        if len(params) != 1:
+            return self.transform_arg(value, tp)
+        param = params[0]
+        param_annotation = param.annotation
+        tp2 = str
+        if param is Parameter.empty:
+            tp2 = param_annotation
+        value = self.transform_arg(value, tp2)
+        return preprocessor(value)
+
     def dispatch(self, name, args):
         cmd = self.commands.get(name)
         if not cmd:
@@ -102,9 +120,11 @@ class CommandDispatcher:
             else:
                 value = vs.get(elem)
                 tp = cmd.argument_types.get(elem)
-                value = self.transform_arg(value, tp)
                 if elem in self.preprocessors:
-                    value = self.preprocessors[elem](value)
+                    preprocessor = self.preprocessors[elem]
+                    value = self.preprocess_arg(value, tp, preprocessor)
+                else:
+                    value = self.transform_arg(value, tp)
                 kwargs[elem] = value
         cmd.func(**kwargs)
 

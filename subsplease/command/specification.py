@@ -81,6 +81,14 @@ class CommandSpecs:
             return self.parse_path(path)
         return self.transform_cmd_elems(path)
 
+    def unpack_optional(self, tp):
+        origin = get_origin(tp)
+        if origin is Union or origin is UnionType:
+            args = get_args(tp)
+            if len(args) == 2 and type(None) in args:
+                tp = args[1] if args[0] is type(None) else args[0]
+        return tp
+
     def add_to_specs(
             self,
             cmd_def: CommandDefinition
@@ -98,7 +106,9 @@ class CommandSpecs:
                 self.ensure_args(curr)
                 match = next((d for d in curr['args'] if elem.name in d['flags']), None)
                 if not match:
+                    # TODO: this should be actually overwritten if we have preprocessor
                     arg_type = cmd_def.argument_types.get(elem.name, str)
+                    arg_type = self.unpack_optional(arg_type)
                     if elem.true_type and elem.true_type != arg_type:
                         arg_type = elem.true_type
                         cmd_def.argument_types[elem.name] = arg_type
