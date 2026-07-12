@@ -17,7 +17,6 @@ from subsplease.jikan import JikanMetadataProvider
 
 # MAYBE: clean up services and extract repos
 # MAYBE: tracking shows that are not on subsplease
-# MAYBE: clean finished shows
 
 
 dispatcher = CommandDispatcher()

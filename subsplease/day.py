@@ -1,4 +1,4 @@
-from subsplease.api import Subsplease, ScheduleEntry
+from subsplease.api import Subsplease, ScheduleEntry, Week
 from subsplease.metadata import MetadataProvider
 from subsplease.db import AnimeDB, LocalShow
 from subsplease.utils import Program
@@ -56,6 +56,20 @@ class DayService:
     # TODO: move
     def update_schedule(self):
         res = self.subs.weekly_schedule().unwrap()
+        self.finish_old(res.schedule)
         for day_name, day_list in res.schedule:
             print(f"Updating {day_name.title()}")
             self.update_local(day_list)
+
+    def finish_old(self, week: Week):
+        ids = set()
+        for _, day in week:
+            for show in day:
+                if show.page:
+                    ids.add(show.page)
+        for show in self.program.current.values():
+            if show.sid not in ids:
+                show.current = False
+                show.tracking = False
+                print(show.sid, show.title_english)
+                self.db.update_show(show)
