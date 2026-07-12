@@ -110,7 +110,6 @@ class CommandDispatcher:
         kwargs = {}
         vs = vars(args)
         for elem in cmd.arguments:
-            # TODO: dispatch services by type
             if elem in self.services:
                 service = self.services.get(elem)
                 kwargs[elem] = service.service if service else None

@@ -13,6 +13,7 @@ from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
 from subsplease.command import CommandDispatcher, CmdArg
 from subsplease.jikan import JikanMetadataProvider
+from subsplease.season import SeasonService
 
 
 # MAYBE: clean up services and extract repos
@@ -79,9 +80,9 @@ def show_season(schedule: ScheduleService):
 
 
 @dispatcher.command(['season', 'update'])
-def update_season(day: DayService):
+def update_season(season: SeasonService):
     '''Update schedule'''
-    day.update_schedule()
+    season.update_schedule()
 
 
 @dispatcher.command([])
@@ -191,6 +192,8 @@ def main():
     sea = Seadex()
     torrent = TorrentSearchService(config, sea)
     dispatcher.add_service('torrent', torrent)
+    season = SeasonService(program, day, subs, db)
+    dispatcher.add_service('season', season)
     subs = SubscriptionService(program)
     dispatcher.add_service('subscriptions', subs)
     sakuga = SakugaBooruAPI()
