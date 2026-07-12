@@ -40,6 +40,9 @@ class DayService:
             self.db.create_entry(show.page, show.title)
         if local and not local.anilist_id:
             self.program.fetch_show(show.title, local)
+        if local and not local.current:
+            local.current = True
+            self.db.update_show(local)
         return local
 
     def show_day(self, day: str):
