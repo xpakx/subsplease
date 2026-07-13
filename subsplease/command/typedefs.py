@@ -15,8 +15,6 @@ class CmdArg:
     ):
         self.name = name
         self.help = help
-        # TODO: that should be later autodetected based on
-        # transformation, etc
         self.true_type = true_type
 
 

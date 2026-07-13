@@ -108,7 +108,6 @@ class CommandSpecs:
                 self.ensure_args(curr)
                 match = next((d for d in curr['args'] if elem.name in d['flags']), None)
                 if not match:
-                    # TODO: this should be actually overwritten if we have preprocessor
                     arg_type = cmd_def.argument_types.get(elem.name, str)
                     arg_type = self.unpack_optional(arg_type)
                     if elem.true_type and elem.true_type != arg_type:
