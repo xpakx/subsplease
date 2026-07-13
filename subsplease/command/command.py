@@ -115,10 +115,9 @@ class CommandDispatcher:
                 kwargs[elem] = service.service if service else None
             else:
                 value = vs.get(elem)
-                tp = cmd.argument_types.get(elem)
                 if elem in self.preprocessors:
                     preprocessor = self.preprocessors[elem]
-                    value = self.preprocess_arg(value, tp, preprocessor)
+                    value = preprocessor(value)
                 kwargs[elem] = value
         cmd.func(**kwargs)
 
@@ -159,6 +158,7 @@ class CommandDispatcher:
         return self
 
     def run(self):
+        self.prepare_preprocessors()
         self.prepare_commands()
         parser = self.specs.parser()
         args = parser.parse_args()
@@ -191,3 +191,7 @@ class CommandDispatcher:
             for flag in flags:
                 cmd_def.flags[flag.name] = flag
             self.specs.add_to_specs(cmd_def)
+
+    def prepare_preprocessors(self):
+        for name, func in self.preprocessors.items():
+            self.specs.populate_preprocessor(name, func)

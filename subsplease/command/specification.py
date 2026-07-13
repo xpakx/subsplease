@@ -1,10 +1,11 @@
-from typing import Any, Literal, Type, Tuple
+from typing import Any, Literal, Type, Tuple, Callable
 from typing import get_origin, get_args, Union
 from types import UnionType
 import argparse
 from pathlib import Path
 from enum import Enum
 from collections.abc import Sequence, Iterable
+from inspect import signature
 
 from subsplease.command.typedefs import (
         CmdElem, CmdArg, CmdFlag,
@@ -16,6 +17,7 @@ from subsplease.command.typedefs import (
 class CommandSpecs:
     def __init__(self):
         self.specs = {}
+        self.annotations: dict[str, type] = {}
 
     def is_flag_type(self, tp: Type[Any]) -> Tuple[bool, Type[Any] | None]:
         if tp in {int, float, str, bool, bytes, Path}:
@@ -112,6 +114,8 @@ class CommandSpecs:
                     if elem.true_type and elem.true_type != arg_type:
                         arg_type = elem.true_type
                         cmd_def.argument_types[elem.name] = arg_type
+                    if elem.name in self.annotations:
+                        tp = self.annotations[elem.name]
                     curr['args'].append({
                         'flags': [elem.name],
                         'type': arg_type,
@@ -125,6 +129,8 @@ class CommandSpecs:
                     arg_type = cmd_def.argument_types.get(elem.name, str)
                     if elem.true_type:
                         arg_type = elem.true_type
+                    if elem.name in self.annotations:
+                        tp = self.annotations[elem.name]
                     if arg_type != match['type']:
                         print(f"WARNING: `{elem.name}` was already defined as "
                               f"{match['type'].__name__} but `{cmd_def.name}()` "
@@ -208,3 +214,12 @@ class CommandSpecs:
 
     def parser(self) -> argparse.ArgumentParser:
         return self.build_parser(self.specs)
+
+    def populate_preprocessor(self, name: str, func: Callable):
+        sig = signature(func)
+        params = [p for p in sig.parameters.values()]
+        if len(params) != 1:
+            return
+        param = params[0]
+        param_annotation = self.unpack_optional(param.annotation)
+        self.annotations[name] = param_annotation
