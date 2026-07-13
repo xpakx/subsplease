@@ -8,6 +8,12 @@ class JikanMedia(msgspec.Struct):
     title: str
 
 
+class JikanTag(msgspec.Struct):
+    id: int = msgspec.field(name="mal_id")
+    name: str
+    type: str
+
+
 class JikanMediaDetails(msgspec.Struct):
     id: int = msgspec.field(name="mal_id")
     title: str
@@ -15,6 +21,9 @@ class JikanMediaDetails(msgspec.Struct):
     title_japanese: str
     details: str = msgspec.field(name="synopsis")
     status: str
+    genres: list[JikanTag]
+    demographics: list[JikanTag]
+    themes: list[JikanTag]
 
 
 class JikanMetadataProvider:
@@ -93,4 +102,5 @@ class JikanMetadataProvider:
 
 if __name__ == "__main__":
     meta = JikanMetadataProvider()
-    print(meta.get_current_season_summary())
+    # print(meta.get_current_season_summary())
+    print(meta.search_show_details_by_id(49233))
