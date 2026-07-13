@@ -159,10 +159,13 @@ def display_details_jikan(show: JikanMediaDetails):
     title = show.title_english or show.title_japanese
     status_color = "green" if show.status == "RELEASING" else "blue"
     status_info = f"[{status_color}]{show.status}[/{status_color}]"
-    # TODO: tags
+
+    tag_list = [f"#{t}" for t in show.tags()[:8]]
+    tags_display = "  ".join(tag_list)
 
     content = Text()
     content.append(f"{clean_desc}\n\n", style="white")
+    content.append(f"{tags_display}", style="dim")
 
     panel = Panel(
         content,

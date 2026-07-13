@@ -25,6 +25,13 @@ class JikanMediaDetails(msgspec.Struct):
     demographics: list[JikanTag]
     themes: list[JikanTag]
 
+    def tags(self) -> list[str]:
+        return [
+            tag.name
+            for tag_group in (self.genres, self.themes, self.demographics)
+            for tag in tag_group
+        ]
+
 
 class JikanMetadataProvider:
     def __init__(self):
@@ -103,4 +110,7 @@ class JikanMetadataProvider:
 if __name__ == "__main__":
     meta = JikanMetadataProvider()
     # print(meta.get_current_season_summary())
-    print(meta.search_show_details_by_id(49233))
+    show = meta.search_show_details_by_id(49233)
+    print(show.ok().tags())
+    from subsplease.display import display_details_jikan
+    display_details_jikan(show.ok())
