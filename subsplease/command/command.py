@@ -1,7 +1,7 @@
 from typing import Callable, Any, Self, get_origin
 from typing import Union, get_args
 from types import UnionType
-from inspect import signature, getdoc, Parameter
+from inspect import signature, getdoc
 
 from subsplease.command.specification import CommandSpecs
 from subsplease.command.typedefs import (
@@ -66,42 +66,6 @@ class CommandDispatcher:
             if len(args) == 2 and type(None) in args:
                 tp = args[1] if args[0] is type(None) else args[0]
         return tp
-
-    # TODO: this could be safely removed after we'll fix preprocessors
-    def transform_arg(self, value, tp: Any):
-        if not tp or tp is Any:
-            return value
-        tp = self.unpack_optional(tp)
-        if isinstance(value, tp):
-            return value
-        if tp is str:
-            return value
-        if tp is int:
-            return int(value) if value is not None else None
-        if tp is float:
-            return float(value) if value is not None else None
-        if tp is bool:
-            return True if value is not None else False
-
-        if tp is not Any:
-            return tp(value) if value is not None else None
-        return value
-
-    # TODO: we actually shouldn't need that, as argparse
-    # parses most things; but we will remove that after
-    # adding some tests first
-    def preprocess_arg(self, value, tp, preprocessor):
-        sig = signature(preprocessor)
-        params = [p for p in sig.parameters.values()]
-        if len(params) != 1:
-            return self.transform_arg(value, tp)
-        param = params[0]
-        param_annotation = param.annotation
-        tp2 = str
-        if param is Parameter.empty:
-            tp2 = param_annotation
-        value = self.transform_arg(value, tp2)
-        return preprocessor(value)
 
     def dispatch(self, name, args):
         cmd = self.commands.get(name)
