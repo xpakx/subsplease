@@ -152,6 +152,12 @@ def display_subs(data: list[LocalShow]):
     console.print(table)
 
 
+def display_subs_tty(data: list[LocalShow]):
+    print("Title\tLast episode")
+    for num, entry in enumerate(data):
+        print(f"{entry.title()}\t{entry.last_episode}")
+
+
 def display_details_jikan(show: JikanMediaDetails):
     console = Console()
 
