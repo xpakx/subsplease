@@ -24,7 +24,10 @@ class CommandDispatcher:
             path: str | list[CmdElem] | None = None,
             flags: list[CmdFlag] | None = None,
             aliases: list[str] | None = None,
+            ignore: bool = False,
     ):
+        if ignore:
+            return
         sig = signature(command)
         args = list(sig.parameters.keys())
         docs = getdoc(command)
@@ -92,6 +95,7 @@ class CommandDispatcher:
             name: str | None = None,
             flags: list[CmdFlag] | None = None,
             aliases: list[str] | None = None,
+            ignore: bool = False,
     ):
         func = None
         if callable(path):
@@ -101,7 +105,8 @@ class CommandDispatcher:
         def decorator(f: Callable):
             registration_name = name if name else f.__name__
             self.register(registration_name, f,
-                          path=path, flags=flags, aliases=aliases)
+                          path=path, flags=flags, aliases=aliases,
+                          ignore=ignore)
             return f
         if func:
             return decorator(func)
