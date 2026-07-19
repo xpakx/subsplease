@@ -1,6 +1,6 @@
 from subsplease.api import Subsplease, EpisodeData
 from subsplease.meta.metadata import MetadataProvider
-from subsplease.meta.jikan import JikanMetadataProvider
+from subsplease.meta.tenrai import TenraiMetadataProvider
 from subsplease.db import AnimeDB, LocalShow
 from subsplease.display import (
         display_latest,
@@ -21,10 +21,10 @@ from rich.prompt import Confirm
 class Program:
     def __init__(self, config: Config, api: Subsplease,
                  meta: MetadataProvider, db: AnimeDB,
-                 torrent: TorrentAPI, jikan: JikanMetadataProvider):
+                 torrent: TorrentAPI, mal: TenraiMetadataProvider):
         self.subs = api
         self.meta = meta
-        self.jikan = jikan
+        self.mal = mal
         self.db = db
         self.only_tracked = False
         self.current: dict[str, LocalShow] = {}
@@ -347,7 +347,7 @@ class Program:
 
     def view_show_jikan(self, title: str):
         print(f"Searching '{title}'")
-        result = self.jikan.search_show_details(title)
+        result = self.mal.search_show_details(title)
         if result.is_ok():
             display_details_jikan(result.unwrap())
         else:

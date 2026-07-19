@@ -1,7 +1,7 @@
 from subsplease.api import Schedule, ScheduleEntry, EpisodeData
 from subsplease.db import LocalShow
 from subsplease.meta.metadata import AniListMediaDetails
-from subsplease.meta.jikan import JikanMediaDetails
+from subsplease.meta.tenrai import TenraiMediaDetails
 from rich.console import Console
 from rich.table import Table
 from rich import box
@@ -158,7 +158,7 @@ def display_subs_tty(data: list[LocalShow]):
         print(f"{entry.title()}\t{entry.last_episode}")
 
 
-def display_details_jikan(show: JikanMediaDetails):
+def display_details_jikan(show: TenraiMediaDetails):
     console = Console()
 
     clean_desc = show.details or "No description."

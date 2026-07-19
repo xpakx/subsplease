@@ -12,7 +12,7 @@ from subsplease.subscription import SubscriptionService
 from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
 from subsplease.command import CommandDispatcher, CmdArg
-from subsplease.meta.jikan import JikanMetadataProvider
+from subsplease.meta.tenrai import TenraiMetadataProvider
 from subsplease.season import SeasonService
 
 
@@ -177,11 +177,11 @@ def update_metadata(program: Program, name: str, title: str):
 def main():
     config = load_config()
     meta = MetadataProvider()
-    jikan = JikanMetadataProvider()
+    tenrai = TenraiMetadataProvider()
     db = AnimeDB(db_path=get_data_location() / 'ani.db')
     api = Subsplease()
     torrent = TorrentAPI(config)
-    program = Program(config, api, meta, db, torrent, jikan)
+    program = Program(config, api, meta, db, torrent, tenrai)
     day = DayService(api, meta, db, program)
     schedule = ScheduleService(api, meta, db, program)
     program.load_shows()
