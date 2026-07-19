@@ -1,5 +1,5 @@
 from subsplease.api import Subsplease
-from subsplease.metadata import MetadataProvider
+from subsplease.meta.metadata import MetadataProvider
 from subsplease.db import AnimeDB
 from subsplease.torrent import TorrentAPI, TorrentSearchService
 from subsplease.utils import Program
@@ -12,7 +12,7 @@ from subsplease.subscription import SubscriptionService
 from subsplease.sakugabooru import SakugaBooruAPI
 from subsplease.images import ImageService
 from subsplease.command import CommandDispatcher, CmdArg
-from subsplease.jikan import JikanMetadataProvider
+from subsplease.meta.jikan import JikanMetadataProvider
 from subsplease.season import SeasonService
 
 

@@ -1,5 +1,5 @@
 from subsplease.api import Subsplease, ScheduleEntry
-from subsplease.metadata import MetadataProvider
+from subsplease.meta.metadata import MetadataProvider
 from subsplease.db import AnimeDB, LocalShow
 from subsplease.utils import Program
 from subsplease.display import display_schedule

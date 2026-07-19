@@ -1,5 +1,5 @@
 from subsplease.api import Subsplease
-from subsplease.metadata import MetadataProvider
+from subsplease.meta.metadata import MetadataProvider
 from subsplease.db import AnimeDB
 from subsplease.display import (
         display_schedule,

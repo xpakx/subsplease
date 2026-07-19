@@ -1,6 +1,6 @@
 from subsplease.api import Subsplease, EpisodeData
-from subsplease.metadata import MetadataProvider
-from subsplease.jikan import JikanMetadataProvider
+from subsplease.meta.metadata import MetadataProvider
+from subsplease.meta.jikan import JikanMetadataProvider
 from subsplease.db import AnimeDB, LocalShow
 from subsplease.display import (
         display_latest,

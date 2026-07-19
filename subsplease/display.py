@@ -1,7 +1,7 @@
 from subsplease.api import Schedule, ScheduleEntry, EpisodeData
 from subsplease.db import LocalShow
-from subsplease.metadata import AniListMediaDetails
-from subsplease.jikan import JikanMediaDetails
+from subsplease.meta.metadata import AniListMediaDetails
+from subsplease.meta.jikan import JikanMediaDetails
 from rich.console import Console
 from rich.table import Table
 from rich import box
