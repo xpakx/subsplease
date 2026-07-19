@@ -102,9 +102,9 @@ def search_show_meta(program: Program, name: str):
     program.view_show(name)
 
 
-@dispatcher.command(['search', ':name', 'jikan'])
-def search_show_jikan(program: Program, name: str):
-    '''Search metadata on jikan'''
+@dispatcher.command(['search', ':name', 'mal'])
+def search_show_mal(program: Program, name: str):
+    '''Search metadata on my anime list'''
     program.view_show_jikan(name)
 
 
