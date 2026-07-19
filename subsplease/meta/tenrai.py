@@ -3,27 +3,27 @@ import requests
 from subsplease.result import Result, Err, Ok
 
 
-class JikanMedia(msgspec.Struct):
+class TenraiMedia(msgspec.Struct):
     id: int = msgspec.field(name="mal_id")
     title: str
 
 
-class JikanTag(msgspec.Struct):
+class TenraiTag(msgspec.Struct):
     id: int = msgspec.field(name="mal_id")
     name: str
     type: str
 
 
-class JikanMediaDetails(msgspec.Struct):
+class TenraiMediaDetails(msgspec.Struct):
     id: int = msgspec.field(name="mal_id")
     title: str
     title_english: str
     title_japanese: str
     details: str = msgspec.field(name="synopsis")
     status: str
-    genres: list[JikanTag]
-    demographics: list[JikanTag]
-    themes: list[JikanTag]
+    genres: list[TenraiTag]
+    demographics: list[TenraiTag]
+    themes: list[TenraiTag]
 
     def tags(self) -> list[str]:
         return [
@@ -33,16 +33,18 @@ class JikanMediaDetails(msgspec.Struct):
         ]
 
 
-# DEPRECATED: Jikan public API will be discontinued on October 1, 2026.
-# see: https://www.patreon.com/jikan/posts/jikan-public-api-161072697
-# TODO: use subsplease.meta.tenrai instead
-class JikanMetadataProvider:
+class TenraiMetadataProvider:
     def __init__(self):
-        self.url = "https://api.jikan.moe/v4/"
+        self.url = "https://api.tenrai.org/v1/"
 
-    def search_show(self, query: str) -> Result[JikanMedia, str]:
+    def search_show(self, query: str) -> Result[TenraiMedia, str]:
         response = requests.get(
-                f"{self.url}anime", params={"q": query, "limit": 1})
+                f"{self.url}anime",
+                params={
+                    "q": query,
+                    "limit": 1,
+                },
+        )
 
         if response.status_code != 200:
             return Err(f"Jikan API Error: {response.status_code}")
@@ -52,13 +54,13 @@ class JikanMetadataProvider:
             if not raw["data"]:
                 return Err("No results found")
 
-            media = msgspec.convert(raw["data"], list[JikanMedia])[0]
+            media = msgspec.convert(raw["data"], list[TenraiMedia])[0]
             return Ok(media)
         except Exception as e:
             return Err(f"Decode error: {e}")
 
     def fetch_titles(
-            self, titles: list[str]) -> Result[dict[int, JikanMedia], str]:
+            self, titles: list[str]) -> Result[dict[int, TenraiMedia], str]:
         results = {}
         for title in titles:
             res = self.search_show(title)
@@ -68,7 +70,7 @@ class JikanMetadataProvider:
         return Ok(results)
 
     def search_show_details(
-            self, query: str) -> Result[JikanMediaDetails, str]:
+            self, query: str) -> Result[TenraiMediaDetails, str]:
         res = self.search_show(query)
         if res.is_err():
             return Err(res.err())  # type: ignore
@@ -77,19 +79,19 @@ class JikanMetadataProvider:
         return self.search_show_details_by_id(mal_id)
 
     def search_show_details_by_id(
-            self, id: int) -> Result[JikanMediaDetails, str]:
+            self, id: int) -> Result[TenraiMediaDetails, str]:
         response = requests.get(f"{self.url}anime/{id}/full")
         if response.status_code != 200:
             return Err(f"Jikan API Error: {response.status_code}")
 
         try:
             raw = response.json()
-            details = msgspec.convert(raw["data"], JikanMediaDetails)
+            details = msgspec.convert(raw["data"], TenraiMediaDetails)
             return Ok(details)
         except Exception as e:
             return Err(f"Decode error: {e}")
 
-    def get_current_season_summary(self) -> Result[list[JikanMedia], str]:
+    def get_current_season_summary(self) -> Result[list[TenraiMedia], str]:
         limit = 25
         response = requests.get(
             f"{self.url}seasons/now",
@@ -104,14 +106,14 @@ class JikanMetadataProvider:
             if not raw.get("data"):
                 return Err("No results found for current season")
 
-            media_list = msgspec.convert(raw["data"], list[JikanMedia])
+            media_list = msgspec.convert(raw["data"], list[TenraiMedia])
             return Ok(media_list)
         except Exception as e:
             return Err(f"Decode error: {e}")
 
 
 if __name__ == "__main__":
-    meta = JikanMetadataProvider()
+    meta = TenraiMetadataProvider()
     # print(meta.get_current_season_summary())
     show = meta.search_show_details_by_id(49233)
     print(show.ok().tags())
