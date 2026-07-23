@@ -184,3 +184,48 @@ def display_details_jikan(show: TenraiMediaDetails):
 
     console.print(panel)
     console.print("\n")
+
+
+def display_data_tty(show: LocalShow):
+    print(f"subsplease link: {show.sid}")
+    print(f"subsplease id: {show.subsplease_id}")
+    print(f"anilist id: {show.anilist_id}")
+    print(f"mal id: {show.jikan_id}")
+    print(f"sakugabooru tag: {show.sakugaboru_tag}")
+    print(f"title english: {show.title_english}")
+    print(f"title romaji: {show.title_romaji}")
+    print(f"title japanese: {show.title_japanese}")
+    print()
+    print(f"target dir: {show.dir_name}")
+    print(f"last episode: {show.last_episode}")
+    print(f"subscribed: {show.tracking}")
+    print(f"current season: {show.current}")
+
+
+def display_data(show: LocalShow):
+    console = Console()
+    table = Table(
+        box=box.ROUNDED,
+        show_header=True,
+        header_style="bold color(255)",
+        border_style="blue",
+    )
+
+    table.add_column("Field", style="cyan", no_wrap=True)
+    table.add_column("Value")
+
+    table.add_row("subsplease link", show.sid)
+    table.add_row("subsplease id", str(show.subsplease_id))
+    table.add_row("anilist id", str(show.anilist_id))
+    table.add_row("mal id", str(show.jikan_id))
+    table.add_row("sakugabooru tag", show.sakugaboru_tag)
+    table.add_row("title english", show.title_english)
+    table.add_row("title romaji", show.title_romaji)
+    table.add_row("title japanese", show.title_japanese)
+    table.add_row("target dir", show.dir_name)
+    table.add_row("last episode", str(show.last_episode))
+    table.add_row("subscribed", str(show.tracking))
+    table.add_row("current season", str(show.current))
+
+    console.print(table)
+    console.print("\n")
