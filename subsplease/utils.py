@@ -31,6 +31,7 @@ class Program:
         self.torrent = torrent
         self.default_quality = config.preferred_quality
         self.selection: None | LocalShow = None
+        self.piped: bool = False
 
     def load_shows(self):
         airing = self.db.get_airing_shows().unwrap()

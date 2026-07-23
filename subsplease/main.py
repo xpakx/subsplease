@@ -14,7 +14,8 @@ from subsplease.images import ImageService
 from subsplease.command import CommandDispatcher, CmdArg
 from subsplease.meta.tenrai import TenraiMetadataProvider
 from subsplease.season import SeasonService
-from subsplease.display import display_data
+from subsplease.display import display_data, display_data_tty
+import sys
 
 
 # MAYBE: clean up services and extract repos
@@ -44,7 +45,11 @@ def show_data(program: Program, name: str):
     '''Explicit local data for the show'''
     program.select(name)
     selection = program.selection
-    if selection:
+    if not selection:
+        return
+    if program.piped:
+        display_data_tty(selection)
+    else:
         display_data(selection)
 
 
@@ -209,6 +214,7 @@ def main():
     sakuga = SakugaBooruAPI()
     images = ImageService(sakuga, db)
     dispatcher.add_service('images', images)
+    program.piped = not sys.stdout.isatty()
 
     dispatcher.run()
 
