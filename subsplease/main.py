@@ -38,6 +38,28 @@ def show_latest(program: Program, name: str):
     program.show_episodes()
 
 
+@dispatcher.command(['show', ':name', 'data'])
+def show_data(program: Program, name: str):
+    '''Explicit local data for the show'''
+    program.select(name)
+    selection = program.selection
+    if not selection:
+        return
+    print(f"subsplease link: {selection.sid}")
+    print(f"subsplease id: {selection.subsplease_id}")
+    print(f"anilist id: {selection.anilist_id}")
+    print(f"mal id: {selection.jikan_id}")
+    print(f"sakugabooru tag: {selection.sakugaboru_tag}")
+    print(f"title english: {selection.title_english}")
+    print(f"title romaji: {selection.title_romaji}")
+    print(f"title japanese: {selection.title_japanese}")
+    print()
+    print(f"target dir: {selection.dir_name}")
+    print(f"last episode: {selection.last_episode}")
+    print(f"subscribed: {selection.tracking}")
+    print(f"current season: {selection.current}")
+
+
 @dispatcher.command(['show', ':name', 'get'])
 @dispatcher.flag('episode', aliases=['-e'], help='episode number')
 def show_get(program: Program, name: str, episode: int | None):
