@@ -317,8 +317,24 @@ class Program:
         num = int(num)
         return num > max_ep
 
+    def view_show_jikan(self, title: str):
+        print(f"Searching '{title}'")
+        result = self.mal.search_show_details(title)
+        if result.is_ok():
+            display_details_jikan(result.unwrap())
+        else:
+            print(result.err())
+
+
+class ShowFileService:
+    def __init__(self, program: Program, subs: Subsplease,
+                 db: AnimeDB):
+        self.program = program
+        self.subs = subs
+        self.db = db
+
     def delete_show(self):
-        show = self.selection
+        show = self.program.selection
         if not show:
             return
         show_id = show.subsplease_id
@@ -345,11 +361,3 @@ class Program:
             print("Folder removed successfully.")
         except OSError as e:
             print(f"Error: {e.strerror}")
-
-    def view_show_jikan(self, title: str):
-        print(f"Searching '{title}'")
-        result = self.mal.search_show_details(title)
-        if result.is_ok():
-            display_details_jikan(result.unwrap())
-        else:
-            print(result.err())

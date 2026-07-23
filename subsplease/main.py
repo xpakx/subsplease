@@ -2,7 +2,7 @@ from subsplease.api import Subsplease
 from subsplease.meta.metadata import MetadataProvider
 from subsplease.db import AnimeDB
 from subsplease.torrent import TorrentAPI, TorrentSearchService
-from subsplease.utils import Program
+from subsplease.utils import Program, ShowFileService
 from subsplease.schedule import ScheduleService
 from subsplease.day import DayService
 from subsplease.date import get_day
@@ -147,10 +147,10 @@ def clean(program: Program):
 
 
 @dispatcher.command(['show', ':name', 'delete'])
-def show_delete(program: Program, name: str):
+def show_delete(program: Program, files: ShowFileService, name: str):
     '''Delete show'''
     program.select(name)
-    program.delete_show()
+    files.delete_show()
 
 
 @dispatcher.command(name='subs')
@@ -199,10 +199,12 @@ def main():
     program = Program(config, api, meta, db, torrent, tenrai)
     day = DayService(api, meta, db, program)
     schedule = ScheduleService(api, meta, db, program)
+    show_files = ShowFileService(program, api, db)
     program.load_shows()
     dispatcher.add_service('program', program)
     dispatcher.add_service('schedule', schedule)
     dispatcher.add_service('day', day)
+    dispatcher.add_service('files', show_files)
     dispatcher.add_preprocessor('weekday', get_day)
     sea = Seadex()
     torrent = TorrentSearchService(config, sea)
